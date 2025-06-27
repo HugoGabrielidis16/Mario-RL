@@ -1,0 +1,780 @@
+Starting Mario DQN Training...
+Note: Every 1 episodes, a GIF will be saved showing Mario's gameplay
+Using device: mps
+Episode: 1/1000, Score: 1085.00, Avg Score: 1085.00, Epsilon: 0.010, Steps: 945, X Position: 296
+Episode 1 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 289 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_1.gif
+Episode: 2/1000, Score: 1884.00, Avg Score: 1484.50, Epsilon: 0.010, Steps: 1439, X Position: 296
+Episode 2 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 365 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_2.gif
+Episode: 3/1000, Score: 2005.00, Avg Score: 1658.00, Epsilon: 0.010, Steps: 1818, X Position: 1138
+Episode 3 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 395 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_3.gif
+Episode: 4/1000, Score: 1830.00, Avg Score: 1701.00, Epsilon: 0.010, Steps: 1967, X Position: 296
+Episode 4 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 722 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_4.gif
+Episode: 5/1000, Score: 2638.00, Avg Score: 1888.40, Epsilon: 0.010, Steps: 3602, X Position: 1229
+Episode 5 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 570 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_5.gif
+Episode: 6/1000, Score: 2163.00, Avg Score: 1934.17, Epsilon: 0.010, Steps: 2845, X Position: 898
+Episode 6 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 476 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_6.gif
+Episode: 7/1000, Score: 2201.00, Avg Score: 1972.29, Epsilon: 0.010, Steps: 2375, X Position: 704
+Episode 7 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 364 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_7.gif
+Episode: 8/1000, Score: 1575.00, Avg Score: 1922.62, Epsilon: 0.010, Steps: 1811, X Position: 1410
+Episode 8 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 966 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_8.gif
+Episode: 9/1000, Score: 1830.00, Avg Score: 1912.33, Epsilon: 0.010, Steps: 4822, X Position: 1138
+Episode 9 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 511 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_9.gif
+Episode: 10/1000, Score: 2274.00, Avg Score: 1948.50, Epsilon: 0.010, Steps: 2547, X Position: 722
+Episode 10 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 162 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_10.gif
+Episode: 11/1000, Score: 1026.00, Avg Score: 1864.64, Epsilon: 0.010, Steps: 801, X Position: 658
+Episode 11 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1163 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_11.gif
+Episode: 12/1000, Score: 2073.00, Avg Score: 1882.00, Epsilon: 0.010, Steps: 5808, X Position: 1140
+Episode 12 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 841 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_12.gif
+Episode: 13/1000, Score: 1451.00, Avg Score: 1848.85, Epsilon: 0.010, Steps: 4200, X Position: 1411
+Episode 13 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 926 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_13.gif
+Episode: 14/1000, Score: 1858.00, Avg Score: 1849.50, Epsilon: 0.010, Steps: 4622, X Position: 1411
+Episode 14 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 329 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_14.gif
+Episode: 15/1000, Score: 1550.00, Avg Score: 1829.53, Epsilon: 0.010, Steps: 1637, X Position: 722
+Episode 15 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2077 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_15.gif
+Episode: 16/1000, Score: 1220.00, Avg Score: 1791.44, Epsilon: 0.010, Steps: 10380, X Position: 722
+Episode 16 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 647 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_16.gif
+Episode: 17/1000, Score: 2093.00, Avg Score: 1809.18, Epsilon: 0.010, Steps: 3230, X Position: 296
+Episode 17 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1021 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_17.gif
+Episode: 18/1000, Score: 1652.00, Avg Score: 1800.44, Epsilon: 0.010, Steps: 5098, X Position: 663
+Episode 18 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1670 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_18.gif
+Episode: 19/1000, Score: 718.00, Avg Score: 1743.47, Epsilon: 0.010, Steps: 8341, X Position: 298
+Episode 19 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 187 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_19.gif
+Episode: 20/1000, Score: 1035.00, Avg Score: 1708.05, Epsilon: 0.010, Steps: 927, X Position: 296
+Episode 20 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 304 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_20.gif
+Episode: 21/1000, Score: 1423.00, Avg Score: 1694.48, Epsilon: 0.010, Steps: 1511, X Position: 1415
+Episode 21 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 98 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_21.gif
+Episode: 22/1000, Score: 680.00, Avg Score: 1648.36, Epsilon: 0.010, Steps: 481, X Position: 296
+Episode 22 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1388 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_22.gif
+Episode: 23/1000, Score: 2180.00, Avg Score: 1671.48, Epsilon: 0.010, Steps: 6933, X Position: 1515
+Episode 23 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2198 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_23.gif
+Episode: 24/1000, Score: 1115.00, Avg Score: 1648.29, Epsilon: 0.010, Steps: 10983, X Position: 296
+Episode 24 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1176 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_24.gif
+Episode: 25/1000, Score: 1442.00, Avg Score: 1640.04, Epsilon: 0.010, Steps: 5873, X Position: 296
+Episode 25 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 573 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_25.gif
+Episode: 26/1000, Score: 2231.00, Avg Score: 1662.77, Epsilon: 0.010, Steps: 2859, X Position: 298
+Episode 26 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1202 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_26.gif
+Episode: 27/1000, Score: 2080.00, Avg Score: 1678.22, Epsilon: 0.010, Steps: 6003, X Position: 1129
+Episode 27 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1017 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_27.gif
+Episode: 28/1000, Score: 2671.00, Avg Score: 1713.68, Epsilon: 0.010, Steps: 5079, X Position: 831
+Episode 28 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 383 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_28.gif
+Episode: 29/1000, Score: 1848.00, Avg Score: 1718.31, Epsilon: 0.010, Steps: 1907, X Position: 296
+Episode 29 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 545 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_29.gif
+Episode: 30/1000, Score: 2433.00, Avg Score: 1742.13, Epsilon: 0.010, Steps: 2716, X Position: 1127
+Episode 30 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 940 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_30.gif
+Episode: 31/1000, Score: 2540.00, Avg Score: 1767.87, Epsilon: 0.010, Steps: 4692, X Position: 1420
+Episode 31 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 638 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_31.gif
+Episode: 32/1000, Score: 1335.00, Avg Score: 1754.34, Epsilon: 0.010, Steps: 3181, X Position: 1411
+Episode 32 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2357 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_32.gif
+Episode: 33/1000, Score: 1561.00, Avg Score: 1748.48, Epsilon: 0.010, Steps: 11779, X Position: 1138
+Episode 33 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2488 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_33.gif
+Episode: 34/1000, Score: 2013.00, Avg Score: 1756.26, Epsilon: 0.010, Steps: 12433, X Position: 1420
+Episode 34 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1537 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_34.gif
+Episode: 35/1000, Score: 2319.00, Avg Score: 1772.34, Epsilon: 0.010, Steps: 7680, X Position: 1127
+Episode 35 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 281 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_35.gif
+Episode: 36/1000, Score: 1786.00, Avg Score: 1772.72, Epsilon: 0.010, Steps: 1397, X Position: 666
+Episode 36 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 675 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_36.gif
+Episode: 37/1000, Score: 1705.00, Avg Score: 1770.89, Epsilon: 0.010, Steps: 3369, X Position: 870
+Episode 37 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1670 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_37.gif
+Episode: 38/1000, Score: 894.00, Avg Score: 1747.82, Epsilon: 0.010, Steps: 8341, X Position: 298
+Episode 38 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 727 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_38.gif
+Episode: 39/1000, Score: 1320.00, Avg Score: 1736.85, Epsilon: 0.010, Steps: 3627, X Position: 1411
+Episode 39 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 444 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_39.gif
+Episode: 40/1000, Score: 1823.00, Avg Score: 1739.00, Epsilon: 0.010, Steps: 2212, X Position: 687
+Episode 40 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 779 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_40.gif
+Episode: 41/1000, Score: 2647.00, Avg Score: 1761.15, Epsilon: 0.010, Steps: 3890, X Position: 1429
+Episode 41 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 594 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_41.gif
+Episode: 42/1000, Score: 2767.00, Avg Score: 1785.10, Epsilon: 0.010, Steps: 2962, X Position: 1124
+Episode 42 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 613 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_42.gif
+Episode: 43/1000, Score: 2341.00, Avg Score: 1798.02, Epsilon: 0.010, Steps: 3060, X Position: 1411
+Episode 43 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 609 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_43.gif
+Episode: 44/1000, Score: 2370.00, Avg Score: 1811.02, Epsilon: 0.010, Steps: 3036, X Position: 1138
+Episode 44 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1416 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_44.gif
+Episode: 45/1000, Score: 1911.00, Avg Score: 1813.24, Epsilon: 0.010, Steps: 7071, X Position: 1429
+Episode 45 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1181 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_45.gif
+Episode: 46/1000, Score: 1934.00, Avg Score: 1815.87, Epsilon: 0.010, Steps: 5897, X Position: 1410
+Episode 46 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 751 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_46.gif
+Episode: 47/1000, Score: 3158.00, Avg Score: 1844.43, Epsilon: 0.010, Steps: 3750, X Position: 1402
+Episode 47 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1826 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_47.gif
+Episode: 48/1000, Score: 2349.00, Avg Score: 1854.94, Epsilon: 0.010, Steps: 9125, X Position: 1418
+Episode 48 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 666 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_48.gif
+Episode: 49/1000, Score: 2345.00, Avg Score: 1864.94, Epsilon: 0.010, Steps: 3323, X Position: 663
+Episode 49 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 272 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_49.gif
+Episode: 50/1000, Score: 1426.00, Avg Score: 1856.16, Epsilon: 0.010, Steps: 1351, X Position: 1403
+Episode 50 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1344 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_50.gif
+Episode: 51/1000, Score: 2664.00, Avg Score: 1872.00, Epsilon: 0.010, Steps: 6712, X Position: 1415
+Episode 51 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 223 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_51.gif
+Episode: 52/1000, Score: 1428.00, Avg Score: 1863.46, Epsilon: 0.010, Steps: 1110, X Position: 1410
+Episode 52 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 602 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_52.gif
+Episode: 53/1000, Score: 2113.00, Avg Score: 1868.17, Epsilon: 0.010, Steps: 3002, X Position: 1401
+Episode 53 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1442 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_53.gif
+Episode: 54/1000, Score: 2619.00, Avg Score: 1882.07, Epsilon: 0.010, Steps: 7203, X Position: 1131
+Episode 54 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1975 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_54.gif
+Episode: 55/1000, Score: 1847.00, Avg Score: 1881.44, Epsilon: 0.010, Steps: 9868, X Position: 659
+Episode 55 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 272 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_55.gif
+Episode: 56/1000, Score: 1431.00, Avg Score: 1873.39, Epsilon: 0.010, Steps: 1353, X Position: 1411
+Episode 56 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 807 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_56.gif
+Episode: 57/1000, Score: 2569.00, Avg Score: 1885.60, Epsilon: 0.010, Steps: 4029, X Position: 1429
+Episode 57 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1767 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_57.gif
+Episode: 58/1000, Score: 1118.00, Avg Score: 1872.36, Epsilon: 0.010, Steps: 8829, X Position: 722
+Episode 58 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 324 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_58.gif
+Episode: 59/1000, Score: 1410.00, Avg Score: 1864.53, Epsilon: 0.010, Steps: 1611, X Position: 1401
+Episode 59 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 676 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_59.gif
+Episode: 60/1000, Score: 2357.00, Avg Score: 1872.73, Epsilon: 0.010, Steps: 3375, X Position: 1137
+Episode 60 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 454 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_60.gif
+Episode: 61/1000, Score: 1387.00, Avg Score: 1864.77, Epsilon: 0.010, Steps: 2262, X Position: 1414
+Episode 61 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 710 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_61.gif
+Episode: 62/1000, Score: 2859.00, Avg Score: 1880.81, Epsilon: 0.010, Steps: 3544, X Position: 1410
+Episode 62 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2138 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_62.gif
+Episode: 63/1000, Score: 2695.00, Avg Score: 1893.73, Epsilon: 0.010, Steps: 10685, X Position: 863
+Episode 63 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1776 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_63.gif
+Episode: 64/1000, Score: 1372.00, Avg Score: 1885.58, Epsilon: 0.010, Steps: 8875, X Position: 296
+Episode 64 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 919 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_64.gif
+Episode: 65/1000, Score: 1855.00, Avg Score: 1885.11, Epsilon: 0.010, Steps: 4586, X Position: 722
+Episode 65 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1056 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_65.gif
+Episode: 66/1000, Score: 1225.00, Avg Score: 1875.11, Epsilon: 0.010, Steps: 5275, X Position: 1411
+Episode 66 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 422 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_66.gif
+Episode: 67/1000, Score: 1809.00, Avg Score: 1874.12, Epsilon: 0.010, Steps: 2101, X Position: 722
+Episode 67 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2026 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_67.gif
+Episode: 68/1000, Score: 1523.00, Avg Score: 1868.96, Epsilon: 0.010, Steps: 10125, X Position: 722
+Episode 68 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 3808 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_68.gif
+Episode: 69/1000, Score: 1548.00, Avg Score: 1864.30, Epsilon: 0.010, Steps: 19031, X Position: 819
+Episode 69 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 748 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_69.gif
+Episode: 70/1000, Score: 2205.00, Avg Score: 1869.17, Epsilon: 0.010, Steps: 3734, X Position: 722
+Episode 70 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 353 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_70.gif
+Episode: 71/1000, Score: 1999.00, Avg Score: 1871.00, Epsilon: 0.010, Steps: 1758, X Position: 1411
+Episode 71 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 435 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_71.gif
+Episode: 72/1000, Score: 1398.00, Avg Score: 1864.43, Epsilon: 0.010, Steps: 2167, X Position: 1411
+Episode 72 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 3698 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_72.gif
+Episode: 73/1000, Score: 3522.00, Avg Score: 1887.14, Epsilon: 0.010, Steps: 18484, X Position: 666
+Episode 73 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 340 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_73.gif
+Episode: 74/1000, Score: 1565.00, Avg Score: 1882.78, Epsilon: 0.010, Steps: 1693, X Position: 691
+Episode 74 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 762 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_74.gif
+Episode: 75/1000, Score: 2081.00, Avg Score: 1885.43, Epsilon: 0.010, Steps: 3804, X Position: 1411
+Episode 75 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2136 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_75.gif
+Episode: 76/1000, Score: 2046.00, Avg Score: 1887.54, Epsilon: 0.010, Steps: 10672, X Position: 1138
+Episode 76 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 695 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_76.gif
+Episode: 77/1000, Score: 2039.00, Avg Score: 1889.51, Epsilon: 0.010, Steps: 3467, X Position: 694
+Episode 77 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1534 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_77.gif
+Episode: 78/1000, Score: 2106.00, Avg Score: 1892.28, Epsilon: 0.010, Steps: 7663, X Position: 1413
+Episode 78 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1183 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_78.gif
+Episode: 79/1000, Score: 1668.00, Avg Score: 1889.44, Epsilon: 0.010, Steps: 5908, X Position: 722
+Episode 79 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 402 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_79.gif
+Episode: 80/1000, Score: 1938.00, Avg Score: 1890.05, Epsilon: 0.010, Steps: 2004, X Position: 1411
+Episode 80 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1625 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_80.gif
+Episode: 81/1000, Score: 1276.00, Avg Score: 1882.47, Epsilon: 0.010, Steps: 8120, X Position: 298
+Episode 81 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1832 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_81.gif
+Episode: 82/1000, Score: 1606.00, Avg Score: 1879.10, Epsilon: 0.010, Steps: 9151, X Position: 722
+Episode 82 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2019 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_82.gif
+Episode: 83/1000, Score: 1974.00, Avg Score: 1880.24, Epsilon: 0.010, Steps: 10089, X Position: 854
+Episode 83 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1343 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_83.gif
+Episode: 84/1000, Score: 2056.00, Avg Score: 1882.33, Epsilon: 0.010, Steps: 6706, X Position: 1126
+Episode 84 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 4814 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_84.gif
+Episode: 85/1000, Score: 962.00, Avg Score: 1871.51, Epsilon: 0.010, Steps: 24062, X Position: 722
+Episode 85 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2367 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_85.gif
+Episode: 86/1000, Score: 1483.00, Avg Score: 1866.99, Epsilon: 0.010, Steps: 11829, X Position: 722
+Episode 86 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1986 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_86.gif
+Episode: 87/1000, Score: 2394.00, Avg Score: 1873.05, Epsilon: 0.010, Steps: 9921, X Position: 1138
+Episode 87 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1911 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_87.gif
+Episode: 88/1000, Score: 2003.00, Avg Score: 1874.52, Epsilon: 0.010, Steps: 9550, X Position: 1131
+Episode 88 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2259 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_88.gif
+Episode: 89/1000, Score: 1539.00, Avg Score: 1870.75, Epsilon: 0.010, Steps: 11289, X Position: 661
+Episode 89 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1706 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_89.gif
+Episode: 90/1000, Score: 1627.00, Avg Score: 1868.04, Epsilon: 0.010, Steps: 8524, X Position: 1140
+Episode 90 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 3242 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_90.gif
+Episode: 91/1000, Score: 744.00, Avg Score: 1855.69, Epsilon: 0.010, Steps: 16202, X Position: 722
+Episode 91 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2247 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_91.gif
+Episode: 92/1000, Score: 1507.00, Avg Score: 1851.90, Epsilon: 0.010, Steps: 11229, X Position: 855
+Episode 92 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1915 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_92.gif
+Episode: 93/1000, Score: 1455.00, Avg Score: 1847.63, Epsilon: 0.010, Steps: 9569, X Position: 722
+Episode 93 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2140 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_93.gif
+Episode: 94/1000, Score: 1630.00, Avg Score: 1845.32, Epsilon: 0.010, Steps: 10693, X Position: 898
+Episode 94 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 640 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_94.gif
+Episode: 95/1000, Score: 1432.00, Avg Score: 1840.97, Epsilon: 0.010, Steps: 3191, X Position: 296
+Episode 95 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1178 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_95.gif
+Episode: 96/1000, Score: 2461.00, Avg Score: 1847.43, Epsilon: 0.010, Steps: 5882, X Position: 898
+Episode 96 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 546 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_96.gif
+Episode: 97/1000, Score: 1676.00, Avg Score: 1845.66, Epsilon: 0.010, Steps: 2721, X Position: 298
+Episode 97 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1968 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_97.gif
+Episode: 98/1000, Score: 1620.00, Avg Score: 1843.36, Epsilon: 0.010, Steps: 9831, X Position: 722
+Episode 98 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 98 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_98.gif
+Episode: 99/1000, Score: 680.00, Avg Score: 1831.61, Epsilon: 0.010, Steps: 481, X Position: 296
+Episode 99 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 98 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_99.gif
+Episode: 100/1000, Score: 680.00, Avg Score: 1820.09, Epsilon: 0.010, Steps: 481, X Position: 296
+Checkpoint saved: checkpoints/mario_dqn_episode_100.pt
+Progress plot saved: training_plots/progress_episode_100.png
+Episode 100 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1338 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_100.gif
+Episode: 101/1000, Score: 1771.00, Avg Score: 1826.95, Epsilon: 0.010, Steps: 6683, X Position: 722
+Episode 101 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1776 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_101.gif
+Episode: 102/1000, Score: 1069.00, Avg Score: 1818.80, Epsilon: 0.010, Steps: 8875, X Position: 722
+Episode 102 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 188 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_102.gif
+Episode: 103/1000, Score: 1152.00, Avg Score: 1810.27, Epsilon: 0.010, Steps: 935, X Position: 791
+Episode 103 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 360 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_103.gif
+Episode: 104/1000, Score: 1042.00, Avg Score: 1802.39, Epsilon: 0.010, Steps: 1791, X Position: 296
+Episode 104 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1325 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_104.gif
+Episode: 105/1000, Score: 1407.00, Avg Score: 1790.08, Epsilon: 0.010, Steps: 6616, X Position: 1415
+Episode 105 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1389 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_105.gif
+Episode: 106/1000, Score: 1804.00, Avg Score: 1786.49, Epsilon: 0.010, Steps: 6937, X Position: 898
+Episode 106 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 525 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_106.gif
+Episode: 107/1000, Score: 1978.00, Avg Score: 1784.26, Epsilon: 0.010, Steps: 2617, X Position: 1415
+Episode 107 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1160 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_107.gif
+Episode: 108/1000, Score: 1502.00, Avg Score: 1783.53, Epsilon: 0.010, Steps: 5793, X Position: 831
+Episode 108 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 98 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_108.gif
+Episode: 109/1000, Score: 680.00, Avg Score: 1772.03, Epsilon: 0.010, Steps: 481, X Position: 296
+Episode 109 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 98 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_109.gif
+Episode: 110/1000, Score: 680.00, Avg Score: 1756.09, Epsilon: 0.010, Steps: 481, X Position: 296
+Episode 110 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 203 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_110.gif
+Episode: 111/1000, Score: 1082.00, Avg Score: 1756.65, Epsilon: 0.010, Steps: 1007, X Position: 296
+Episode 111 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 158 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_111.gif
+Episode: 112/1000, Score: 1064.00, Avg Score: 1746.56, Epsilon: 0.010, Steps: 785, X Position: 296
+Episode 112 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 534 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_112.gif
+Episode: 113/1000, Score: 1460.00, Avg Score: 1746.65, Epsilon: 0.010, Steps: 2663, X Position: 678
+Episode 113 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 157 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_113.gif
+Episode: 114/1000, Score: 1033.00, Avg Score: 1738.40, Epsilon: 0.010, Steps: 779, X Position: 296
+Episode 114 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2150 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_114.gif
+Episode: 115/1000, Score: 1891.00, Avg Score: 1741.81, Epsilon: 0.010, Steps: 10745, X Position: 1416
+Episode 115 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2525 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_115.gif
+Episode: 116/1000, Score: 2443.00, Avg Score: 1754.04, Epsilon: 0.010, Steps: 12617, X Position: 1128
+Episode 116 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2837 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_116.gif
+Episode: 117/1000, Score: 1559.00, Avg Score: 1748.70, Epsilon: 0.010, Steps: 14179, X Position: 826
+Episode 117 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 769 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_117.gif
+Episode: 118/1000, Score: 2480.00, Avg Score: 1756.98, Epsilon: 0.010, Steps: 3839, X Position: 1408
+Episode 118 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 830 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_118.gif
+Episode: 119/1000, Score: 1791.00, Avg Score: 1767.71, Epsilon: 0.010, Steps: 4141, X Position: 663
+Episode 119 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 778 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_119.gif
+Episode: 120/1000, Score: 1883.00, Avg Score: 1776.19, Epsilon: 0.010, Steps: 3883, X Position: 1401
+Episode 120 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2393 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_120.gif
+Episode: 121/1000, Score: 2214.00, Avg Score: 1784.10, Epsilon: 0.010, Steps: 11959, X Position: 1138
+Episode 121 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1066 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_121.gif
+Episode: 122/1000, Score: 1200.00, Avg Score: 1789.30, Epsilon: 0.010, Steps: 5322, X Position: 1401
+Episode 122 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 783 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_122.gif
+Episode: 123/1000, Score: 1309.00, Avg Score: 1780.59, Epsilon: 0.010, Steps: 3910, X Position: 1410
+Episode 123 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 541 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_123.gif
+Episode: 124/1000, Score: 1347.00, Avg Score: 1782.91, Epsilon: 0.010, Steps: 2697, X Position: 1401
+Episode 124 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2224 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_124.gif
+Episode: 125/1000, Score: 1930.00, Avg Score: 1787.79, Epsilon: 0.010, Steps: 11111, X Position: 898
+Episode 125 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 703 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_125.gif
+Episode: 126/1000, Score: 1941.00, Avg Score: 1784.89, Epsilon: 0.010, Steps: 3508, X Position: 677
+Episode 126 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 538 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_126.gif
+Episode: 127/1000, Score: 1362.00, Avg Score: 1777.71, Epsilon: 0.010, Steps: 2683, X Position: 1413
+Episode 127 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 427 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_127.gif
+Episode: 128/1000, Score: 2009.00, Avg Score: 1771.09, Epsilon: 0.010, Steps: 2127, X Position: 898
+Episode 128 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 753 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_128.gif
+Episode: 129/1000, Score: 2460.00, Avg Score: 1777.21, Epsilon: 0.010, Steps: 3757, X Position: 706
+Episode 129 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 363 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_129.gif
+Episode: 130/1000, Score: 1405.00, Avg Score: 1766.93, Epsilon: 0.010, Steps: 1806, X Position: 1413
+Episode 130 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1935 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_130.gif
+Episode: 131/1000, Score: 1427.00, Avg Score: 1755.80, Epsilon: 0.010, Steps: 9667, X Position: 677
+Episode 131 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2732 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_131.gif
+Episode: 132/1000, Score: 1439.00, Avg Score: 1756.84, Epsilon: 0.010, Steps: 13655, X Position: 855
+Episode 132 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 370 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_132.gif
+Episode: 133/1000, Score: 1463.00, Avg Score: 1755.86, Epsilon: 0.010, Steps: 1841, X Position: 722
+Episode 133 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 105 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_133.gif
+Episode: 134/1000, Score: 663.00, Avg Score: 1742.36, Epsilon: 0.010, Steps: 517, X Position: 290
+Episode 134 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 211 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_134.gif
+Episode: 135/1000, Score: 1034.00, Avg Score: 1729.51, Epsilon: 0.010, Steps: 1047, X Position: 290
+Episode 135 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1872 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_135.gif
+Episode: 136/1000, Score: 1520.00, Avg Score: 1726.85, Epsilon: 0.010, Steps: 9353, X Position: 722
+Episode 136 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1750 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_136.gif
+Episode: 137/1000, Score: 1385.00, Avg Score: 1723.65, Epsilon: 0.010, Steps: 8745, X Position: 898
+Episode 137 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 3440 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_137.gif
+Episode: 138/1000, Score: 1530.00, Avg Score: 1730.01, Epsilon: 0.010, Steps: 17195, X Position: 722
+Episode 138 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2008 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_138.gif
+Episode: 139/1000, Score: 1578.00, Avg Score: 1732.59, Epsilon: 0.010, Steps: 10035, X Position: 1410
+Episode 139 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 3533 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_139.gif
+Episode: 140/1000, Score: 1510.00, Avg Score: 1729.46, Epsilon: 0.010, Steps: 17660, X Position: 1127
+Episode 140 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2070 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_140.gif
+Episode: 141/1000, Score: 1956.00, Avg Score: 1722.55, Epsilon: 0.010, Steps: 10344, X Position: 1408
+Episode 141 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 391 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_141.gif
+Episode: 142/1000, Score: 1211.00, Avg Score: 1706.99, Epsilon: 0.010, Steps: 1947, X Position: 296
+Episode 142 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1670 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_142.gif
+Episode: 143/1000, Score: 715.00, Avg Score: 1690.73, Epsilon: 0.010, Steps: 8341, X Position: 722
+Episode 143 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 987 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_143.gif
+Episode: 144/1000, Score: 3041.00, Avg Score: 1697.44, Epsilon: 0.010, Steps: 4930, X Position: 1415
+Episode 144 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1935 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_144.gif
+Episode: 145/1000, Score: 4894.00, Avg Score: 1727.27, Epsilon: 0.010, Steps: 9666, X Position: 872
+Episode 145 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2213 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_145.gif
+Episode: 146/1000, Score: 2931.00, Avg Score: 1737.24, Epsilon: 0.010, Steps: 11057, X Position: 1409
+Episode 146 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 98 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_146.gif
+Episode: 147/1000, Score: 680.00, Avg Score: 1712.46, Epsilon: 0.010, Steps: 481, X Position: 296
+Episode 147 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 500 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_147.gif
+Episode: 148/1000, Score: 1010.00, Avg Score: 1699.07, Epsilon: 0.010, Steps: 2495, X Position: 298
+Episode 148 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1670 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_148.gif
+Episode: 149/1000, Score: 718.00, Avg Score: 1682.80, Epsilon: 0.010, Steps: 8341, X Position: 298
+Episode 149 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 98 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_149.gif
+Episode: 150/1000, Score: 680.00, Avg Score: 1675.34, Epsilon: 0.010, Steps: 481, X Position: 296
+Episode 150 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 563 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_150.gif
+Episode: 151/1000, Score: 1406.00, Avg Score: 1662.76, Epsilon: 0.010, Steps: 2807, X Position: 298
+Episode 151 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 218 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_151.gif
+Episode: 152/1000, Score: 1414.00, Avg Score: 1662.62, Epsilon: 0.010, Steps: 1083, X Position: 296
+Episode 152 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 700 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_152.gif
+Episode: 153/1000, Score: 1800.00, Avg Score: 1659.49, Epsilon: 0.010, Steps: 3494, X Position: 1138
+Episode 153 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1256 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_153.gif
+Episode: 154/1000, Score: 2265.00, Avg Score: 1655.95, Epsilon: 0.010, Steps: 6272, X Position: 722
+Episode 154 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 2038 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_154.gif
+Episode: 155/1000, Score: 1881.00, Avg Score: 1656.29, Epsilon: 0.010, Steps: 10182, X Position: 1138
+Episode 155 - Initial frame shape: (240, 256, 3), dtype: uint8
+Saving GIF with 1699 frames
+First frame shape: (240, 256, 3), dtype: uint8, min: 0, max: 252
+Saved gameplay GIF: gameplay_gifs/7d_2h_21s/episode_155.gif
