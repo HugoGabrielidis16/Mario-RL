@@ -4,6 +4,83 @@ import cv2
 import numpy as np
 from collections import deque
 
+
+def get_mario_action_set(complexity="balanced"):
+    """
+    Get different action sets for Mario based on training complexity
+    
+    Args:
+        complexity: "minimal", "balanced", "complete", "reckless", "speedrun"
+    
+    Returns:
+        list: Action combinations for JoypadSpace
+    """
+    
+    action_sets = {
+        # 🔰 MINIMAL (Current - Too Limited!)
+        "minimal": [
+            ["right"],          # 0: Move right
+            ["right", "A"]      # 1: Move right + jump
+        ],
+        
+        # 🎯 BALANCED (Recommended for Learning)
+        "balanced": [
+            [],                 # 0: No action (important for timing!)
+            ["right"],          # 1: Move right
+            ["right", "A"],     # 2: Move right + jump
+            ["A"],              # 3: Jump in place
+            ["left"],           # 4: Move left (escape/positioning)
+            ["down"],           # 5: Duck/crouch (avoid enemies, enter pipes)
+            ["right", "B"],     # 6: Run right (speed)
+            ["right", "A", "B"] # 7: Run right + jump (long jumps)
+        ],
+        
+        # 🏃‍♂️ RECKLESS (Aggressive Movement)
+        "reckless": [
+            ["right"],              # 0: Move right
+            ["right", "A"],         # 1: Jump right  
+            ["right", "B"],         # 2: Run right
+            ["right", "A", "B"],    # 3: Run + jump right
+            ["A"],                  # 4: Jump in place
+            ["right", "B", "A"],    # 5: Running jump (same as 3, for emphasis)
+            ["B"],                  # 6: Run in place (build momentum)
+        ],
+        
+        # 🚀 SPEEDRUN (Fast Completion)
+        "speedrun": [
+            ["right"],              # 0: Walk right
+            ["right", "B"],         # 1: Run right  
+            ["right", "A", "B"],    # 2: Running jump
+            ["A", "B"],             # 3: High jump
+            ["right", "A"],         # 4: Walk + jump
+            [],                     # 5: Stop (rare but needed)
+        ],
+        
+        # 🎮 COMPLETE (Advanced Players)
+        "complete": [
+            [],                     # 0: No action
+            ["right"],              # 1: Walk right
+            ["left"],               # 2: Walk left  
+            ["down"],               # 3: Duck
+            ["A"],                  # 4: Jump
+            ["B"],                  # 5: Run/fire
+            ["right", "A"],         # 6: Jump right
+            ["left", "A"],          # 7: Jump left
+            ["right", "B"],         # 8: Run right
+            ["left", "B"],          # 9: Run left
+            ["right", "A", "B"],    # 10: Running jump right
+            ["left", "A", "B"],     # 11: Running jump left
+            ["down", "A"],          # 12: Duck jump (rare but useful)
+        ],
+        "own" : [
+            []
+        ]
+    }
+    
+    return action_sets.get(complexity, action_sets["balanced"])
+
+
+
 class CUSTOMMarioEnvironmentRL:
     def __init__(
         self,
@@ -11,6 +88,7 @@ class CUSTOMMarioEnvironmentRL:
         frame_stack=4,
         frame_skip=4,
         reward_shaping=True,  # Enable custom reward shaping
+        action_set = "balanced",
     ):
         """
         RL-Optimized Mario Environment with Custom Reward Shaping
@@ -22,7 +100,7 @@ class CUSTOMMarioEnvironmentRL:
             reward_shaping: Whether to apply custom reward modifications
         """
         self.env = gym_super_mario_bros.make('SuperMarioBros-v0')
-        self.env = JoypadSpace(self.env, [["left"], ["right"], ["right", "A"]])
+        self.env = JoypadSpace(self.env, get_mario_action_set(action_set))
         self.action_space = self.env.action_space
         self.observation_space = self.env.observation_space
         self.resized_shape = resize_shape
@@ -164,11 +242,12 @@ class CUSTOMMarioEnvironmentRL:
             reward -= 50  # Significant death penalty
         
         # Time bonus (encourage faster completion)
+        """
         if current_time > 350:  # Plenty of time left
             reward += 0.1
         elif current_time < 100:  # Running out of time
             reward -= 0.2
-        
+        """
         # 4. BEHAVIORAL SHAPING
         # Penalty for being stuck (not making progress)
         if self.stuck_counter > 30:  # Stuck for too long

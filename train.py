@@ -66,7 +66,9 @@ def train_mario(
         batch_size=32,
         replay_frequency=4,  # Train every N steps
         target_update_frequency=10,  # Update target every N episodes
-        buffer_size=500):  # Larger buffer
+        buffer_size=500,
+        state_shape = (64,64),
+        custom_env = True):  # Larger buffer
     """
     Train Mario using RL-optimized environment with improved training strategy and TQDM progress bars
     
@@ -86,19 +88,23 @@ def train_mario(
         target_update_frequency: Update target network every N episodes
         buffer_size: Replay buffer size
     """
-    # Create RL-optimized environment
-    state_shape = (64, 64)
-    env = MarioEnvironmentRL(
-        resize_shape=state_shape,
-        frame_stack=frame_stack,
-        frame_skip=frame_skip
-    )
-    env = CUSTOMMarioEnvironmentRL(
+    if custom_env:
+       # Create RL-optimized environment
+        env = CUSTOMMarioEnvironmentRL(
         resize_shape=state_shape,
         frame_stack=frame_stack,
         frame_skip=frame_skip,
-        reward_shaping=True
-    )
+        reward_shaping=True,
+        action_set= "balanced"
+        )
+    else:
+        # Use classical gym reward environment
+        env = MarioEnvironmentRL(
+        resize_shape=state_shape,
+        frame_stack=frame_stack,
+        frame_skip=frame_skip,
+        ) 
+
     
     # Create agent - state shape now includes frame stack dimension
     n_actions = env.action_space.n
@@ -136,6 +142,7 @@ def train_mario(
     print(f"   • Epsilon: {epsilon_start} → {epsilon_end} (decay: {epsilon_decay})")
     print(f"   • Buffer Size: {buffer_size}")
     print(f"   • Batch Size: {batch_size}")
+    print(f"   • Render Every: {render_every} ")
     print(f"   • Replay Frequency: Every {replay_frequency} steps")
     
     # Early stopping and adaptive training
@@ -199,8 +206,7 @@ def train_mario(
                 agent.remember(stacked_state, action, reward, next_stacked_state, done)
                 
                 # Train agent at specified frequency
-                if (len(agent.replay_buffer) >= batch_size and 
-                    steps % replay_frequency == 0):
+                if (len(agent.replay_buffer) >= batch_size and steps % replay_frequency == 0):
                     loss = agent.replay(batch_size)
                     if loss is not None:
                         episode_losses.append(loss)
@@ -220,6 +226,9 @@ def train_mario(
                 step_pbar.set_postfix({
                     'Score': f'{total_reward:.0f}',
                     'X_pos': f"{info.get('x_pos', 0)}",
+                    'Y_pos' : f"{info.get('y_pos',0)}",
+                    'Current_reward' : reward,
+                    #'LIFE' : f"{info.get('life',0)}",
                     'Steps': steps
                 })
                 
@@ -306,7 +315,7 @@ def train_mario(
             # Save training plots every 50 episodes
             if episode % 50 == 0 and episode > 0:
                 tqdm.write(f"📈 Saving training plots at episode {episode+1}...")
-                save_training_plots(scores, losses, epsilon_history, episode_lengths, episode)
+                #save_training_plots(scores, losses, epsilon_history, episode_lengths, episode)
             
             # Save model checkpoints
             if episode % save_every == 0 and episode > 0:
@@ -343,7 +352,7 @@ def train_mario(
         
         # Save final model and plots
         agent.save(f'checkpoints/final_model_{model_name}.pth')
-        save_training_plots(scores, losses, epsilon_history, episode_lengths, episode, final=True)
+        #save_training_plots(scores, losses, epsilon_history, episode_lengths, episode, final=True)
         
         env.close()
     
@@ -355,50 +364,39 @@ def train_mario(
         'total_time_minutes': total_time/60 if 'total_time' in locals() else 0
     }
 
-def progress_logger_enhanced(episode, episodes, scores, total_reward, avg_score, 
-                           avg_loss, agent, steps, info, save_every, 
-                           patience_counter, best_avg_score):
-    """
-    Simplified progress logger since TQDM handles most display
-    This function can still be used for file logging or custom metrics
-    """
-    # Log to file or custom metrics collection
-    # The TQDM progress bars handle the console display
-    pass
-
-# Example usage with TQDM
 if __name__ == "__main__":
-    print("🚀 Starting Mario training with TQDM progress bars...")
-    
-    # Install tqdm if not available
-    
-    agent, scores, metrics = train_mario(
-        model_name="ResNETv1",
-        episodes=1000,
-        buffer_size=30000,  # Increased from 500
-        render_every=200,   # Less frequent GIFs for speed
-        batch_size=64       # Larger batches
-    )
-    
-    print(f"🎯 Training completed! Best score: {metrics['best_avg_score']:.2f}")
-    print(f"⏱️  Total time: {metrics['total_time_minutes']:.1f} minutes")
 
-# Example usage with improved parameters
-if __name__ == "__main__":
-    SAVING_FOLDER = "gameplay_gifs/"
+    date = datetime.datetime.now()
+    now = f"{date.day}d_{date.hour}h_{date.minute}m"
+
+    SAVING_FOLDER = "gameplay_gifs/" + now
+    STATE_SHAPE = (84,84)
     EPISODES = 1000
+    RENDER_EVERY = 500
     FRAMES_SKIP = 2
-    BUFFER_SIZE = 500
-    BATCH_SIWE = 16
+    BUFFER_SIZE = 30000
+    BATCH_SIZE = 64
     REPLAY_FREQUENCY = 4
+    FRAME_STACK = 4
+    EPSILON_DECAY = 0.995
+    SAVE_EVERY = 100
+    LEARNING_RATE = 3e-4
+    CUSTOM_ENV = True
+
     agent, scores, metrics = train_mario(
         model_name="ResNETv1",
-        episodes=1000,
-        frame_skip=2,        # Better reactivity
+        episodes=EPISODES,
+        learning_rate=LEARNING_RATE,
+        frame_stack= FRAME_STACK,
+        frame_skip=FRAMES_SKIP,        # Better reactivity
         epsilon_decay=0.995, # Slower decay per episode
-        batch_size=16,       # Larger batches for stability
-        buffer_size=500,   # More diverse experiences
-        replay_frequency=4   # Train every 4 steps
+        batch_size=BATCH_SIZE,       # Larger batches for stability
+        render_every= RENDER_EVERY,
+        buffer_size=BUFFER_SIZE,   # More diverse experiences
+        replay_frequency=REPLAY_FREQUENCY,   # Train every 4 steps
+        save_every=SAVE_EVERY,
+        custom_env= CUSTOM_ENV,
+        state_shape = STATE_SHAPE,
     )
     
     print(f"🎯 Training completed with best score: {metrics['best_avg_score']:.2f}")
