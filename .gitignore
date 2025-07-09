@@ -2,3 +2,4 @@
 *.DS_Store
 *.pth
 __pycache__/
+gameplay_gifs/.DS_Store
