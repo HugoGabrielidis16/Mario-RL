@@ -19,7 +19,6 @@ def save_frames_as_gif(frames,
     
     # Debug first frame
     print(f"Saving GIF with {len(frames)} frames")
-    print(f"First frame shape: {frames[0].shape}, dtype: {frames[0].dtype}, min: {frames[0].min()}, max: {frames[0].max()}")
     
     # Convert frames to PIL Images
     pil_frames = []

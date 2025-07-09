@@ -4,7 +4,7 @@ import datetime
 from tqdm import tqdm
 from collections import deque
 from environnement import MarioEnvironmentRL
-from custom_environnement import CUSTOMMarioEnvironmentRL
+from custom_environnement import CUSTOMMarioEnvironmentRL, MarioV2Environment
 import time
 
 from model.DQN import DQN
@@ -68,7 +68,10 @@ def train_mario(
         target_update_frequency=10,  # Update target every N episodes
         buffer_size=500,
         state_shape = (64,64),
-        custom_env = True):  # Larger buffer
+        custom_env = True,
+        moveset = "balanced",
+        advanced_pbar = True,
+        *args,**kwargs):  # Larger buffer
     """
     Train Mario using RL-optimized environment with improved training strategy and TQDM progress bars
     
@@ -90,12 +93,12 @@ def train_mario(
     """
     if custom_env:
        # Create RL-optimized environment
-        env = CUSTOMMarioEnvironmentRL(
+        env = MarioV2Environment(
         resize_shape=state_shape,
         frame_stack=frame_stack,
         frame_skip=frame_skip,
         reward_shaping=True,
-        action_set= "balanced"
+        action_set= moveset
         )
     else:
         # Use classical gym reward environment
@@ -144,6 +147,9 @@ def train_mario(
     print(f"   • Batch Size: {batch_size}")
     print(f"   • Render Every: {render_every} ")
     print(f"   • Replay Frequency: Every {replay_frequency} steps")
+    print(f"   • Using Env: {type(env).__name__}")
+    print(f"   • Using Move set: {moveset}")
+    print()
     
     # Early stopping and adaptive training
     best_avg_score = -float('inf')
@@ -221,16 +227,34 @@ def train_mario(
                 total_reward += reward
                 steps += 1
                 
+
+                debug_info = env.get_debug_info()
+                zone_tracker = debug_info['zone_tracker']
+                game_state = debug_info['game_state']
+
                 # Update step progress bar
                 step_pbar.update(1)
-                step_pbar.set_postfix({
+
+                if advanced_pbar:
+                    step_pbar.set_postfix({
                     'Score': f'{total_reward:.0f}',
                     'X_pos': f"{info.get('x_pos', 0)}",
-                    'Y_pos' : f"{info.get('y_pos',0)}",
-                    'Current_reward' : reward,
-                    #'LIFE' : f"{info.get('life',0)}",
-                    'Steps': steps
+                    'Y_pos': f"{info.get('y_pos', 0)}",
+                    'Current_reward': reward,
+                    'Steps': steps,
+                    'Zone': zone_tracker['current_zone'][:8] if zone_tracker['current_zone'] else 'None',  # Truncated
+                    'Stuck': zone_tracker['stuck_counter'],
+                    'Max_X': game_state['max_x_pos']
                 })
+                else:
+                    step_pbar.set_postfix({
+                        'Score': f'{total_reward:.0f}',
+                        'X_pos': f"{info.get('x_pos', 0)}",
+                        'Y_pos' : f"{info.get('y_pos',0)}",
+                        'Current_reward' : reward,
+                        #'LIFE' : f"{info.get('life',0)}",
+                        'Steps': steps
+                    })
                 
                 if done or steps >= max_steps:
                     break
@@ -372,16 +396,17 @@ if __name__ == "__main__":
     SAVING_FOLDER = "gameplay_gifs/" + now
     STATE_SHAPE = (84,84)
     EPISODES = 1000
-    RENDER_EVERY = 500
+    RENDER_EVERY = 1
     FRAMES_SKIP = 2
-    BUFFER_SIZE = 30000
-    BATCH_SIZE = 64
-    REPLAY_FREQUENCY = 4
-    FRAME_STACK = 4
+    BUFFER_SIZE = 20000
+    BATCH_SIZE = 32
+    REPLAY_FREQUENCY = 1
+    FRAME_STACK = 5
     EPSILON_DECAY = 0.995
     SAVE_EVERY = 100
-    LEARNING_RATE = 3e-4
+    LEARNING_RATE = 2e-3
     CUSTOM_ENV = True
+    MOVESET = "reckless"
 
     agent, scores, metrics = train_mario(
         model_name="ResNETv1",
@@ -397,6 +422,7 @@ if __name__ == "__main__":
         save_every=SAVE_EVERY,
         custom_env= CUSTOM_ENV,
         state_shape = STATE_SHAPE,
+        moveset = MOVESET
     )
     
     print(f"🎯 Training completed with best score: {metrics['best_avg_score']:.2f}")
