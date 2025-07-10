@@ -2,4 +2,5 @@
 *.DS_Store
 *.pth
 __pycache__/
+script/cloud_script.sh
 gameplay_gifs/.DS_Store
