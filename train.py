@@ -389,7 +389,6 @@ def train_mario(
     }
 
 if __name__ == "__main__":
-
     date = datetime.datetime.now()
     now = f"{date.day}d_{date.hour}h_{date.minute}m"
 

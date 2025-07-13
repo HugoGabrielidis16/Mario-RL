@@ -1,9 +1,9 @@
+opencv-python-headless==4.7.0.72
 torch>=2.0.0
 torchvision>=0.15.0
 gym==0.25.2
 gym-super-mario-bros==7.4.0
 nes-py==8.2.1
-opencv-python==4.8.1.78
 matplotlib>=3.7.0
 numpy>=1.24.0
 Pillow>=9.0.0

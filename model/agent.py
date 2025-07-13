@@ -35,7 +35,9 @@ class Agent:
                 buffer_size=10000):
         
         self.model = model
-        self.device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+        self.device = torch.device("mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu") 
+        print(f"🌐 Initializing agent on device: {self.device}")
+
         
         print(f"🖥️  Using device: {self.device}")
         print(f"📊 State shape: {state_shape}")
