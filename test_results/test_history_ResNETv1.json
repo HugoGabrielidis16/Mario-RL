@@ -1,0 +1,15 @@
+[
+  {
+    "episode": 2,
+    "training_avg_score": 4916.13000000001,
+    "test_results": {
+      "episodes_tested": 3,
+      "levels_completed": 0,
+      "completion_rate": 0.0,
+      "average_score": 1258.8000000000036,
+      "best_score": 1258.8000000000036,
+      "worst_score": 1258.8000000000036,
+      "score_std": 0.0,
+      "average_episode_length": 403.0,
+      "average_x_position": 282.0,
+      "best_x_position": 

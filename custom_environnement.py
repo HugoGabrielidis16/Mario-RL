@@ -458,8 +458,8 @@ class MarioV2Environment:
                 'challenge_type': 'enemy_timing',
                 'description': 'Goomba/enemy navigation requiring timing',
                 'max_stuck_frames': 50,
-                'progress_multiplier': 3.0,
-                'breakthrough_bonus': 25.0,
+                'progress_multiplier': 1.0,
+                'breakthrough_bonus': 100.0,
                 'pattern_rewards': {
                     'enemy_jump_timing': {
                         'sequence': [1, 0, 2],  # right → pause → walk+jump
@@ -486,8 +486,8 @@ class MarioV2Environment:
                 'challenge_type': 'complex_platforming',
                 'description': 'Double jump sequence for large gap',
                 'max_stuck_frames': 80,
-                'progress_multiplier': 6.0,
-                'breakthrough_bonus': 50.0,
+                'progress_multiplier': 1.0,
+                'breakthrough_bonus': 100.0,
                 'pattern_rewards': {
                     'classic_double_jump': {
                         'sequence': [7, 0, 3],     # run+jump → pause → jump
@@ -513,19 +513,6 @@ class MarioV2Environment:
                 'exploration_bonus': 2.0,
                 'survival_bonus': 0.8
             },
-            
-            # Expandable for future zones
-            'future_zone_template': {
-                'x_range': (0, 0),  # Disabled
-                'challenge_type': 'custom',
-                'description': 'Template for new zones',
-                'max_stuck_frames': 40,
-                'progress_multiplier': 2.0,
-                'breakthrough_bonus': 15.0,
-                'pattern_rewards': {},
-                'exploration_bonus': 0.5,
-                'survival_bonus': 0.3
-            }
         }
     
     def _initialize_game_state(self):
@@ -760,7 +747,7 @@ class MarioV2Environment:
             # Check if recent actions match this pattern
             if self._matches_pattern(recent_actions, pattern_sequence):
                 reward += pattern_reward
-                
+
                 # Track successful patterns
                 if pattern_name not in self.action_tracker['successful_patterns']:
                     self.action_tracker['successful_patterns'][pattern_name] = 0

@@ -7,8 +7,9 @@ from PIL import Image
 
 def save_frames_as_gif(frames, 
             episode, 
+            gif_filename,
             fps=30,
-            saving_folder = "gameplay_gifs/"
+            saving_folder = "gameplay_gifs/",
             ):
     """Save frames as a GIF for visualization"""
     os.makedirs(saving_folder, exist_ok=True)
@@ -43,13 +44,13 @@ def save_frames_as_gif(frames,
     # Save as GIF
     if pil_frames:
         pil_frames[0].save(
-            f'{saving_folder}/episode_{episode}.gif',
+            gif_filename,
             save_all=True,
             append_images=pil_frames[1:],
             duration=1000//fps,
             loop=0
         )
-        print(f"Saved gameplay GIF: {saving_folder}/episode_{episode}.gif")
+        print(f"Saved gameplay GIF: {gif_filename}")
 
 
 

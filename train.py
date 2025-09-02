@@ -51,11 +51,9 @@ def load_model(
     return agent
 
 
-
 def train_mario(
         model_name="DQN",
         episodes=1000, 
-        render_every=100, 
         save_every=100,
         frame_stack=4,
         frame_skip=2,  # Reduced from 4 for better reactivity
@@ -70,7 +68,12 @@ def train_mario(
         state_shape = (64,64),
         custom_env = True,
         moveset = "balanced",
+        max_steps = 2000,
         advanced_pbar = True,
+        test_every = 1,
+        test_episodes = 3,  # Number of episodes to test each time
+        test_save_gifs = True,  # Enable GIF saving for testing by default
+        verbose = True,
         *args,**kwargs):  # Larger buffer
     """
     Train Mario using RL-optimized environment with improved training strategy and TQDM progress bars
@@ -78,7 +81,6 @@ def train_mario(
     Args:
         model_name: Type of RL model to use
         episodes: Number of training episodes
-        render_every: Save GIF every N episodes
         save_every: Save model every N episodes
         frame_stack: Number of frames to stack for temporal info
         frame_skip: Number of frames to skip (action repeat)
@@ -87,9 +89,13 @@ def train_mario(
         epsilon_end: Final exploration rate
         epsilon_decay: Epsilon decay rate per episode
         batch_size: Training batch size
+        max_steps: Maximum steps per episode
         replay_frequency: Train every N steps
         target_update_frequency: Update target network every N episodes
         buffer_size: Replay buffer size
+        test_every: Test the model every M episodes (0 to disable)
+        test_episodes: Number of episodes to run during testing
+        test_save_gifs: Whether to save GIFs during periodic testing
     """
     if custom_env:
        # Create RL-optimized environment
@@ -98,7 +104,8 @@ def train_mario(
         frame_stack=frame_stack,
         frame_skip=frame_skip,
         reward_shaping=True,
-        action_set= moveset
+        action_set= moveset,
+        verbose=verbose
         )
     else:
         # Use classical gym reward environment
@@ -131,11 +138,14 @@ def train_mario(
     losses = []
     epsilon_history = []
     episode_lengths = []
+    test_history = []  # Store test results over time
     
     # Create save directories
     os.makedirs('checkpoints', exist_ok=True)
     os.makedirs('training_plots', exist_ok=True)
     os.makedirs('gameplay_gifs', exist_ok=True)
+    if test_every > 0:
+        os.makedirs('test_results', exist_ok=True)
     
     print(f"\n🎮 Starting training with:")
     print(f"   • Frame Stack: {frame_stack}")
@@ -145,10 +155,11 @@ def train_mario(
     print(f"   • Epsilon: {epsilon_start} → {epsilon_end} (decay: {epsilon_decay})")
     print(f"   • Buffer Size: {buffer_size}")
     print(f"   • Batch Size: {batch_size}")
-    print(f"   • Render Every: {render_every} ")
     print(f"   • Replay Frequency: Every {replay_frequency} steps")
     print(f"   • Using Env: {type(env).__name__}")
     print(f"   • Using Move set: {moveset}")
+    if test_every > 0:
+        print(f"   • Testing: Every {test_every} episodes ({test_episodes} test episodes)")
     print()
     
     # Early stopping and adaptive training
@@ -169,6 +180,43 @@ def train_mario(
     # Training start time for ETA calculation
     training_start_time = time.time()
     
+    def run_test_evaluation(episode_num, agent):
+        """Run test evaluation and return results"""
+        try:
+            # Save current model temporarily for testing
+            temp_model_path = f'checkpoints/temp_test_model_{model_name}_{episode}.pth'
+            agent.save(temp_model_path)
+            
+            # Determine if we should save GIFs this test cycle
+            should_save_test_gifs = test_save_gifs
+            
+            # Run test with no exploration
+            test_results = test_mario_integrated(
+                model_path=temp_model_path,
+                model_name=model_name,
+                episodes=test_episodes,
+                render_all=False,
+                save_gifs=should_save_test_gifs,
+                frame_stack=frame_stack,
+                frame_skip=frame_skip,
+                state_shape=state_shape,
+                custom_env=custom_env,
+                moveset=moveset,
+                advanced_display=False,  # Keep it quiet during training
+                max_steps_per_episode=2000, 
+                episode_num=episode_num
+            )
+            
+            # Clean up temp file
+            if os.path.exists(temp_model_path):
+                os.remove(temp_model_path)
+            
+            return test_results
+            
+        except Exception as e:
+            tqdm.write(f"⚠️ Test evaluation failed: {e}")
+            return None
+    
     try:
         for episode in episode_pbar:
             episode_start_time = time.time()
@@ -179,18 +227,8 @@ def train_mario(
             steps = 0
             episode_losses = []
             
-            # Store frames for visualization
-            frames = []
-            save_frames_this_episode = (episode % render_every == 0 and episode > 0)
-            
-            # Debug info
-            if save_frames_this_episode:
-                tqdm.write(f"📹 Episode {episode+1} - Recording GIF (Stacked: {stacked_state.shape}, Raw: {raw_state.shape})")
-                if raw_state.shape[2] == 3:  # RGB frame
-                    frames.append(raw_state.copy())
             
             # Create inner progress bar for steps within episode (optional, for long episodes)
-            max_steps = 2000  # Reasonable maximum for Mario episodes
             step_pbar = tqdm(
                 total=max_steps,
                 desc=f"🏃 Episode {episode+1}",
@@ -217,10 +255,7 @@ def train_mario(
                     if loss is not None:
                         episode_losses.append(loss)
                 
-                # Store frames for visualization
-                if save_frames_this_episode and steps % 5 == 0:
-                    if raw_next_state is not None and raw_next_state.shape[2] == 3:
-                        frames.append(raw_next_state.copy())
+                # No frame saving during training
                 
                 # Update state
                 stacked_state = next_stacked_state
@@ -308,8 +343,8 @@ def train_mario(
             eta_seconds = avg_episode_time * (episodes - episode - 1)
             eta_minutes = eta_seconds / 60
             
-            # Update main progress bar with rich information
-            episode_pbar.set_postfix({
+            # Prepare postfix data
+            postfix_data = {
                 'Score': f'{total_reward:.0f}',
                 'Avg': f'{avg_score:.1f}',
                 'Best': f'{best_avg_score:.1f}',
@@ -319,22 +354,80 @@ def train_mario(
                 'Time': f'{episode_time:.1f}s',
                 'ETA': f'{eta_minutes:.1f}m',
                 'Buffer': len(agent.replay_buffer),
-                'Patience': f'{patience_counter}/{patience}'
-            })
+                'Patience': f'{patience_counter}/{patience}',
+                'Best_X': f'{game_state["max_x_pos"]}'
+            }
             
+            # Run periodic testing
+            if test_every > 0 and (episode + 1) % test_every == 0 and episode > 0:
+                tqdm.write(f"🧪 Running test evaluation at episode {episode+1}...")
+                
+                # Temporarily close the main progress bar to avoid interference
+                episode_pbar.close()
+                
+                # Run test evaluation
+                test_results = run_test_evaluation(episode + 1, agent, {
+                    'frame_stack': frame_stack,
+                    'frame_skip': frame_skip,
+                    'state_shape': state_shape,
+                    'custom_env': custom_env,
+                    'moveset': moveset
+                })
+                
+                if test_results:
+                    # Store test results
+                    test_entry = {
+                        'episode': episode + 1,
+                        'training_avg_score': avg_score,
+                        'test_results': test_results['statistics']
+                    }
+                    test_history.append(test_entry)
+                    
+                    # Log test results
+                    test_stats = test_results['statistics']
+                    tqdm.write(f"🏆 Test Results (Episode {episode+1}):")
+                    tqdm.write(f"   • Test Avg Score: {test_stats['average_score']:.1f}")
+                    tqdm.write(f"   • Completion Rate: {test_stats['completion_rate']:.1f}%")
+                    tqdm.write(f"   • Best Test Score: {test_stats['best_score']:.0f}")
+                    tqdm.write(f"   • Avg X Position: {test_stats['average_x_position']:.0f}")
+                    
+                    # Add test info to progress bar postfix
+                    postfix_data.update({
+                        'TestAvg': f"{test_stats['average_score']:.1f}",
+                        'Complete%': f"{test_stats['completion_rate']:.0f}%"
+                    })
+                    
+                # Recreate the progress bar
+                episode_pbar = tqdm(
+                    range(episode + 1, episodes),
+                    initial=0,
+                    desc="🍄 Training Mario",
+                    unit="episode", 
+                    colour="green",
+                    dynamic_ncols=True,
+                    leave=True
+                )
+            
+            # Update main progress bar with rich information
+            episode_pbar.set_postfix(postfix_data)
+            save_frames_this_episode = True
             # Periodic detailed logging (less frequent to avoid spam)
             if episode % 10 == 0 or save_frames_this_episode:
-                tqdm.write(
+                log_msg = (
                     f"📊 Episode {episode+1}: Score={total_reward:.0f}, "
                     f"Avg={avg_score:.1f}, Best={best_avg_score:.1f}, "
                     f"Epsilon={agent.epsilon:.3f}, X_pos={info.get('x_pos', 0)}, "
                     f"Buffer={len(agent.replay_buffer)}"
                 )
+                # Add test info if available
+                if test_history and test_history[-1]['episode'] == episode + 1:
+                    last_test = test_history[-1]['test_results']
+                    log_msg += f", TestAvg={last_test['average_score']:.1f}"
+                
+                tqdm.write(log_msg)
             
-            # Save gameplay GIF
-            if save_frames_this_episode and frames:
-                tqdm.write(f"💾 Saving GIF for episode {episode+1}...")
-                save_frames_as_gif(frames, episode+1, saving_folder=SAVING_FOLDER)
+            # GIF saving now happens during testing phases
+
             
             # Save training plots every 50 episodes
             if episode % 50 == 0 and episode > 0:
@@ -364,6 +457,26 @@ def train_mario(
         # Close progress bar
         episode_pbar.close()
         
+        # Final test evaluation if testing is enabled
+        if test_every > 0:
+            tqdm.write(f"\n🧪 Running final test evaluation...")
+            final_test_results = run_test_evaluation(episode + 1, agent, {
+                'frame_stack': frame_stack,
+                'frame_skip': frame_skip,
+                'state_shape': state_shape,
+                'custom_env': custom_env,
+                'moveset': moveset
+            })
+            
+            if final_test_results:
+                test_entry = {
+                    'episode': episode + 1,
+                    'training_avg_score': np.mean(moving_avg) if moving_avg else 0,
+                    'test_results': final_test_results['statistics'],
+                    'final_test': True
+                }
+                test_history.append(test_entry)
+        
         # Training completed
         total_time = time.time() - training_start_time
         tqdm.write(f"\n🏁 Training completed!")
@@ -373,6 +486,21 @@ def train_mario(
         tqdm.write(f"   • Best average score: {best_avg_score:.2f}")
         tqdm.write(f"   • Final epsilon: {agent.epsilon:.4f}")
         tqdm.write(f"   • Buffer size: {len(agent.replay_buffer)}")
+        
+        # Print test summary if available
+        if test_history:
+            tqdm.write(f"\n🧪 Test Summary:")
+            tqdm.write(f"   • Total tests run: {len(test_history)}")
+            
+            # Get best test performance
+            best_test = max(test_history, key=lambda x: x['test_results']['completion_rate'])
+            tqdm.write(f"   • Best test completion rate: {best_test['test_results']['completion_rate']:.1f}% (Episode {best_test['episode']})")
+            
+            if len(test_history) > 1:
+                final_test = test_history[-1]['test_results']
+                first_test = test_history[0]['test_results'] 
+                improvement = final_test['completion_rate'] - first_test['completion_rate']
+                tqdm.write(f"   • Improvement: {improvement:+.1f}% completion rate")
         
         # Save final model and plots
         agent.save(f'checkpoints/final_model_{model_name}.pth')
@@ -385,8 +513,183 @@ def train_mario(
         'epsilon_history': epsilon_history,
         'episode_lengths': episode_lengths,
         'best_avg_score': best_avg_score,
-        'total_time_minutes': total_time/60 if 'total_time' in locals() else 0
+        'total_time_minutes': total_time/60 if 'total_time' in locals() else 0,
+        'test_history': test_history  # Include test results in return
     }
+
+
+def test_mario_integrated(
+        model_path=None,
+        model_name="DQN",
+        episodes=10,
+        render_all=True,
+        save_gifs=True,
+        frame_stack=4,
+        frame_skip=2,
+        state_shape=(64, 64),
+        custom_env=True,
+        moveset="balanced",
+        advanced_display=True,
+        epsilon_override=0.0,  # Override epsilon for testing
+        max_steps_per_episode=2000,
+        episode_num=None,  # Training episode number for GIF naming,
+        verbose = True,
+        *args, **kwargs):
+    """
+    Integrated test function optimized for use during training
+    Now includes frame capture and GIF saving functionality
+    """
+    
+    # Create the same environment as training
+    if custom_env:
+        env = MarioV2Environment(
+            resize_shape=state_shape,
+            frame_stack=frame_stack,
+            frame_skip=frame_skip,
+            reward_shaping=True,
+            action_set=moveset,
+            verbose=verbose,
+        )
+    else:
+        env = MarioEnvironmentRL(
+            resize_shape=state_shape,
+            frame_stack=frame_stack,
+            frame_skip=frame_skip,
+        )
+    
+    # Create agent with same architecture
+    n_actions = env.action_space.n
+    stacked_state_shape = (frame_stack, state_shape[0], state_shape[1])
+    
+    # Load the trained model
+    agent = load_model(
+        model_name=model_name,
+        state_shape=stacked_state_shape,
+        n_actions=n_actions,
+        learning_rate=1e-4,  # Not used in testing
+        epsilon_start=epsilon_override,
+        epsilon_end=epsilon_override,
+        epsilon_decay=1.0,  # No decay during testing
+        batch_size=32,  # Not used in testing
+        buffer_size=100  # Minimal buffer for testing
+    )
+    
+    # Load model weights
+    if model_path and os.path.exists(model_path):
+        agent.load(model_path)
+    else:
+        raise ValueError(f"Model path {model_path} does not exist")
+    
+    # Set agent to testing mode
+    agent.epsilon = epsilon_override
+    
+    # Test metrics
+    test_scores = []
+    test_episode_lengths = []
+    completion_rates = []
+    max_x_positions = []
+    level_completions = 0
+    
+    # Create directories for test GIFs
+    if save_gifs:
+        os.makedirs('test_gifs', exist_ok=True)
+    
+    # Run test episodes
+    for episode in range(episodes):
+        # Reset environment
+        stacked_state, raw_state = env.reset()
+        total_reward = 0
+        steps = 0
+        
+        # Frame capture setup for GIF saving
+        frames = []
+        should_capture_frames = save_gifs and (render_all or episode == 0)  # Save first episode or all
+        
+        if should_capture_frames:
+            print(f"📹 Recording test episode {episode+1} for GIF...")
+            if raw_state is not None and len(raw_state.shape) == 3 and raw_state.shape[2] == 3:
+                frames.append(raw_state.copy())
+        
+        # Episode loop
+        while steps < max_steps_per_episode:
+            # Select action (no exploration)
+            action = agent.act(stacked_state, training=False)
+            
+            # Step environment
+            next_stacked_state, reward, done, info, raw_next_state = env.step(action)
+            
+            # Capture frames for GIF (every 3 steps to keep GIF manageable)
+            if should_capture_frames and steps % 3 == 0:
+                if raw_next_state is not None and len(raw_next_state.shape) == 3 and raw_next_state.shape[2] == 3:
+                    frames.append(raw_next_state.copy())
+            
+            # Update state and metrics
+            stacked_state = next_stacked_state
+            total_reward += reward
+            steps += 1
+            
+            if done:
+                break
+        
+        # Save GIF for this test episode
+        if should_capture_frames and frames:
+            # Create descriptive filename
+            level_completed = info.get('flag_get', False) or info.get('x_pos', 0) > 3000
+            completion_status = "completed" if level_completed else "failed"
+            x_pos = info.get('x_pos', 0)
+            
+            if episode_num is not None:  # Called during training
+                gif_filename = f'{SAVING_FOLDER}/training_ep{episode_num}_test{episode+1}_{completion_status}_score{total_reward:.0f}_x{x_pos}.gif'
+            else:  # Standalone test
+                gif_filename = f'{SAVING_FOLDER}/test_ep{episode+1}_{completion_status}_score{total_reward:.0f}_x{x_pos}.gif'
+            
+            print(f"💾 Saving test GIF: {gif_filename}")
+            
+            # Save GIF using your existing function (assuming it exists)
+            try:
+                save_frames_as_gif(frames = frames, 
+                                   episode = episode+1, 
+                                   gif_filename= gif_filename,
+                                   saving_folder=SAVING_FOLDER)
+            except NameError:
+                import imageio
+                imageio.mimsave(gif_filename, frames, fps=10)
+        
+        # Collect metrics
+        test_scores.append(total_reward)
+        test_episode_lengths.append(steps)
+        
+        # Check if level was completed
+        level_completed = info.get('flag_get', False) or info.get('x_pos', 0) > 3000
+        if level_completed:
+            level_completions += 1
+        
+        completion_rates.append(1.0 if level_completed else 0.0)
+        max_x_positions.append(info.get('x_pos', 0))
+    
+    # Compile results
+    results = {
+        'scores': test_scores,
+        'episode_lengths': test_episode_lengths,
+        'max_x_positions': max_x_positions,
+        'completion_rates': completion_rates,
+        'statistics': {
+            'episodes_tested': len(test_scores),
+            'levels_completed': level_completions,
+            'completion_rate': np.mean(completion_rates) * 100 if completion_rates else 0,
+            'average_score': np.mean(test_scores) if test_scores else 0,
+            'best_score': np.max(test_scores) if test_scores else 0,
+            'worst_score': np.min(test_scores) if test_scores else 0,
+            'score_std': np.std(test_scores) if test_scores else 0,
+            'average_episode_length': np.mean(test_episode_lengths) if test_episode_lengths else 0,
+            'average_x_position': np.mean(max_x_positions) if max_x_positions else 0,
+            'best_x_position': np.max(max_x_positions) if max_x_positions else 0,
+        }
+    }
+    
+    env.close()
+    return results
+
 
 if __name__ == "__main__":
     date = datetime.datetime.now()
@@ -394,34 +697,36 @@ if __name__ == "__main__":
 
     SAVING_FOLDER = "gameplay_gifs/" + now
     STATE_SHAPE = (84,84)
-    EPISODES = 1000
-    RENDER_EVERY = 1
-    FRAMES_SKIP = 2
+    EPISODES = 100
+    MAX_STEPS = 5000
+    TEST_EVERY = 1
+    FRAMES_SKIP = 1
     BUFFER_SIZE = 20000
-    BATCH_SIZE = 32
+    BATCH_SIZE = 128
     REPLAY_FREQUENCY = 1
     FRAME_STACK = 5
     EPSILON_DECAY = 0.995
     SAVE_EVERY = 100
     LEARNING_RATE = 2e-3
     CUSTOM_ENV = True
-    MOVESET = "reckless"
+    MOVESET = "balanced"
+    MAX_STEPS = 5000
 
     agent, scores, metrics = train_mario(
         model_name="ResNETv1",
         episodes=EPISODES,
+        max_steps=MAX_STEPS,
         learning_rate=LEARNING_RATE,
         frame_stack= FRAME_STACK,
         frame_skip=FRAMES_SKIP,        # Better reactivity
         epsilon_decay=0.995, # Slower decay per episode
         batch_size=BATCH_SIZE,       # Larger batches for stability
-        render_every= RENDER_EVERY,
         buffer_size=BUFFER_SIZE,   # More diverse experiences
         replay_frequency=REPLAY_FREQUENCY,   # Train every 4 steps
         save_every=SAVE_EVERY,
         custom_env= CUSTOM_ENV,
         state_shape = STATE_SHAPE,
-        moveset = MOVESET
+        moveset = MOVESET,
+        test_every = TEST_EVERY
     )
-    
     print(f"🎯 Training completed with best score: {metrics['best_avg_score']:.2f}")

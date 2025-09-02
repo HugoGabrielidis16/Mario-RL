@@ -1,0 +1,7 @@
+
+
+TODO:
+    - Implement the test_mario function to see the model decision with the epsilon-greedy policy
+        -> Actually the saved frame should be using this act(training = False) and not the act(training = True)
+        for saving frame
+    

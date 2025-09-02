@@ -89,10 +89,10 @@ class MultiFrameResNet(nn.Module):
     def __init__(self, 
                  n_actions=3,
                  state_shape=(4, 64, 64),  # (frame_stack, height, width)
-                 layers=[2, 2, 2, 2], 
+                 layers=[3,4,6,3], 
                  block=BasicBlock,
-                 fusion_strategy='early',
-                 dropout_rate=0.0,
+                 fusion_strategy='conv3d',
+                 dropout_rate=0.1,
                  *args,
                  **kwargs):
         super(MultiFrameResNet, self).__init__()
