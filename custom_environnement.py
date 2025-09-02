@@ -452,7 +452,8 @@ class MarioV2Environment:
     
     def _initialize_difficulty_zones(self):
         """Define intelligent difficulty zones with specific handling strategies"""
-        return {
+        return {}
+        {
             'enemy_navigation_594': {
                 'x_range': (590, 600),
                 'challenge_type': 'enemy_timing',
@@ -461,26 +462,16 @@ class MarioV2Environment:
                 'progress_multiplier': 1.0,
                 'breakthrough_bonus': 100.0,
                 'pattern_rewards': {
-                    'enemy_jump_timing': {
-                        'sequence': [1, 0, 2],  # right → pause → walk+jump
-                        'reward': 4.0,
-                        'description': 'Timed jump over enemy'
-                    },
-                    'running_enemy_clear': {
-                        'sequence': [6, 7],     # run → run+jump
+                    'high_clearance_jump': {
+                        'sequence': [6, 6, 7],  # run → run → run+jump (build speed for height)
                         'reward': 5.0,
-                        'description': 'Running jump over enemy'
-                    },
-                    'positioning_jump': {
-                        'sequence': [1, 1, 3], # right → right → jump
-                        'reward': 3.0,
-                        'description': 'Positioned jump'
+                        'description': 'High jump for pipe clearance'
                     }
                 },
                 'exploration_bonus': 1.0,
                 'survival_bonus': 0.5
             },
-            
+
             'double_jump_722': {
                 'x_range': (720, 730),
                 'challenge_type': 'complex_platforming',
@@ -991,9 +982,9 @@ class MarioV2Environment:
     
     def _preprocess_frame(self, frame):
         """Optimized frame preprocessing"""
-        gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-        resized = cv2.resize(gray, self.resize_shape, interpolation=cv2.INTER_AREA)
-        return resized.astype(np.float32) / 255.0
+        gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY) # RGB to Gray
+        resized = cv2.resize(gray, self.resize_shape, interpolation=cv2.INTER_AREA) # Resize
+        return resized.astype(np.float32) / 255.0 # Normalize
     
     def _get_stacked_frames(self):
         """Get current stacked frames"""

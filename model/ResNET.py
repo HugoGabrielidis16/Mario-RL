@@ -91,7 +91,7 @@ class MultiFrameResNet(nn.Module):
                  state_shape=(4, 64, 64),  # (frame_stack, height, width)
                  layers=[3,4,6,3], 
                  block=BasicBlock,
-                 fusion_strategy='conv3d',
+                 fusion_strategy='early',
                  dropout_rate=0.1,
                  *args,
                  **kwargs):

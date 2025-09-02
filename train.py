@@ -180,7 +180,7 @@ def train_mario(
     # Training start time for ETA calculation
     training_start_time = time.time()
     
-    def run_test_evaluation(episode_num, agent):
+    def run_test_evaluation(episode_num, agent, env):
         """Run test evaluation and return results"""
         try:
             # Save current model temporarily for testing
@@ -696,21 +696,20 @@ if __name__ == "__main__":
     now = f"{date.day}d_{date.hour}h_{date.minute}m"
 
     SAVING_FOLDER = "gameplay_gifs/" + now
-    STATE_SHAPE = (84,84)
-    EPISODES = 100
-    MAX_STEPS = 5000
-    TEST_EVERY = 1
-    FRAMES_SKIP = 1
-    BUFFER_SIZE = 20000
-    BATCH_SIZE = 128
-    REPLAY_FREQUENCY = 1
-    FRAME_STACK = 5
-    EPSILON_DECAY = 0.995
-    SAVE_EVERY = 100
-    LEARNING_RATE = 2e-3
+    STATE_SHAPE = (84, 84)
+    EPISODES = 5000
+    MAX_STEPS = 4000
+    TEST_EVERY = 50
+    FRAMES_SKIP = 4         # Critical change
+    BUFFER_SIZE = 50000
+    BATCH_SIZE = 64
+    REPLAY_FREQUENCY = 4
+    FRAME_STACK = 4
+    EPSILON_DECAY = 0.999
+    SAVE_EVERY = 250
+    LEARNING_RATE = 0.0001
     CUSTOM_ENV = True
-    MOVESET = "balanced"
-    MAX_STEPS = 5000
+    MOVESET = "balanced"    # Perfect choice
 
     agent, scores, metrics = train_mario(
         model_name="ResNETv1",

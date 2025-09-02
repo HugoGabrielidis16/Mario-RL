@@ -66,7 +66,14 @@ class Agent:
         self.target_network.load_state_dict(self.q_network.state_dict())
         
         # Optimizer and replay buffer
-        self.optimizer = optim.Adam(self.q_network.parameters(), lr=learning_rate)
+        self.optimizer = optim.Adam(self.q_network.parameters(), 
+                                    lr=learning_rate,
+                                    weight_decay=1e-5)
+        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 
+                                                              mode='max', 
+                                                              factor=0.5, 
+                                                              patience=1000, 
+                                                              verbose=True)
         self.replay_buffer = ReplayBuffer(buffer_size)
         
         # Training metrics
