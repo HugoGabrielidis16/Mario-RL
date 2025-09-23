@@ -6,15 +6,37 @@ from collections import deque
 from environnement import MarioEnvironmentRL
 from custom_environnement import CUSTOMMarioEnvironmentRL, MarioV2Environment
 import time
+import argparse
+import torch
+import torch.distributed as dist
+import torch.multiprocessing as mp
+from torch.nn.parallel import DistributedDataParallel as DDP
 
 from model.DQN import DQN
 from model.ResNET import MultiFrameResNet
 from model.agent import Agent
-from visualization import save_frames_as_gif, progress_logger
+from visualization import save_frames_as_gif, save_episode_as_gif, progress_logger
 
 import warnings
 warnings.filterwarnings("ignore")
 
+
+SAVING_FOLDER = "gamplay_gifs"
+
+def setup_ddp(rank, world_size, backend='nccl'):
+    """Initialize distributed training"""
+    os.environ['MASTER_ADDR'] = 'localhost'
+    os.environ['MASTER_PORT'] = '12355'
+
+    # Initialize the process group
+    dist.init_process_group(backend, rank=rank, world_size=world_size)
+
+    # Set device for this process
+    torch.cuda.set_device(rank)
+
+def cleanup_ddp():
+    """Clean up distributed training"""
+    dist.destroy_process_group()
 
 def load_model(
             state_shape,
@@ -26,16 +48,24 @@ def load_model(
             buffer_size,
             epsilon_decay,
             model_name = "DQN",
+            rank=None,
+            world_size=None,
+            optimizer_type='adamw',
+            weight_decay=1e-4,
+            scheduler_type='exponential',
+            scheduler_gamma=0.999,
+            scheduler_step_size=1000,
+            total_episodes=5000,
             *args,
             **kwargs
             ):
-    print("Using model: ",model_name)
+    print(f"Using model: {model_name}" + (f" on rank {rank}/{world_size}" if rank is not None else ""))
     if model_name == "DQN":
         model = DQN
-    if model_name == "ResNETv1":
+    elif model_name == "ResNETv1":
         model = MultiFrameResNet
     else:
-        raise ValueError("Model name Innapropriate")
+        raise ValueError("Model name Inappropriate")
 
     agent = Agent(
         model = model,
@@ -46,14 +76,40 @@ def load_model(
         epsilon_end=epsilon_end,
         epsilon_decay=epsilon_decay,
         batch_size=batch_size,
-        buffer_size=buffer_size
+        buffer_size=buffer_size,
+        rank=rank,
+        world_size=world_size,
+        optimizer_type=optimizer_type,
+        weight_decay=weight_decay,
+        scheduler_type=scheduler_type,
+        scheduler_gamma=scheduler_gamma,
+        scheduler_step_size=scheduler_step_size,
+        total_episodes=total_episodes
     )
     return agent
 
 
+def train_mario_distributed(rank, world_size, **kwargs):
+    """
+    Distributed training wrapper function
+    """
+    try:
+        # Setup DDP
+        setup_ddp(rank, world_size)
+
+        # Run training with distributed parameters
+        kwargs['rank'] = rank
+        kwargs['world_size'] = world_size
+        result = train_mario(**kwargs)
+
+        return result
+    finally:
+        # Cleanup DDP
+        cleanup_ddp()
+
 def train_mario(
         model_name="DQN",
-        episodes=1000, 
+        episodes=1000,
         save_every=100,
         frame_stack=4,
         frame_skip=2,  # Reduced from 4 for better reactivity
@@ -74,6 +130,13 @@ def train_mario(
         test_episodes = 3,  # Number of episodes to test each time
         test_save_gifs = True,  # Enable GIF saving for testing by default
         verbose = True,
+        rank=None,  # DDP rank
+        world_size=None,  # DDP world size
+        optimizer_type='adamw',  # New optimizer options
+        weight_decay=1e-4,
+        scheduler_type='exponential',  # New scheduler options
+        scheduler_gamma=0.999,
+        scheduler_step_size=1000,
         *args,**kwargs):  # Larger buffer
     """
     Train Mario using RL-optimized environment with improved training strategy and TQDM progress bars
@@ -129,7 +192,15 @@ def train_mario(
         epsilon_end=epsilon_end,
         epsilon_decay=epsilon_decay,
         batch_size=batch_size,
-        buffer_size=buffer_size
+        buffer_size=buffer_size,
+        rank=rank,
+        world_size=world_size,
+        optimizer_type=optimizer_type,
+        weight_decay=weight_decay,
+        scheduler_type=scheduler_type,
+        scheduler_gamma=scheduler_gamma,
+        scheduler_step_size=scheduler_step_size,
+        total_episodes=episodes
     )
     
     # Training metrics
@@ -149,6 +220,12 @@ def train_mario(
     
     print(f"\n🎮 Starting training with:")
     print(f"   • Frame Stack: {frame_stack}")
+    print(f"   • Learning Rate: {learning_rate}")
+    print(f"   • Number of Episodes: {episodes}")
+    print(f"   • Saving at folder: {SAVING_FOLDER}")
+    print(f"   • Max Steps per Episode: {max_steps}")
+    print(f"   • Test every {test_every} episodes with {test_episodes} episodes each")
+    print(f"   • Saving every {save_every} episodes")
     print(f"   • Frame Skip: {frame_skip}")
     print(f"   • State Shape: {stacked_state_shape}")
     print(f"   • Action Space: {n_actions}")
@@ -158,6 +235,7 @@ def train_mario(
     print(f"   • Replay Frequency: Every {replay_frequency} steps")
     print(f"   • Using Env: {type(env).__name__}")
     print(f"   • Using Move set: {moveset}")
+
     if test_every > 0:
         print(f"   • Testing: Every {test_every} episodes ({test_episodes} test episodes)")
     print()
@@ -304,7 +382,11 @@ def train_mario(
                 # Manual epsilon decay if method doesn't exist
                 if agent.epsilon > agent.epsilon_end:
                     agent.epsilon *= agent.epsilon_decay
-            
+
+            # Step learning rate scheduler
+            if hasattr(agent, 'step_scheduler'):
+                agent.step_scheduler(avg_score if hasattr(agent, 'scheduler_type') and agent.scheduler_type == 'plateau' else None)
+
             # Update target network
             if episode % target_update_frequency == 0:
                 agent.update_target_network()
@@ -344,11 +426,13 @@ def train_mario(
             eta_minutes = eta_seconds / 60
             
             # Prepare postfix data
+            current_lr = agent.get_current_lr() if hasattr(agent, 'get_current_lr') else learning_rate
             postfix_data = {
                 'Score': f'{total_reward:.0f}',
                 'Avg': f'{avg_score:.1f}',
                 'Best': f'{best_avg_score:.1f}',
                 'ε': f'{agent.epsilon:.3f}',
+                'LR': f'{current_lr:.2e}',
                 'Loss': f'{avg_loss:.4f}',
                 'Steps': steps,
                 'Time': f'{episode_time:.1f}s',
@@ -604,22 +688,22 @@ def test_mario_integrated(
         # Frame capture setup for GIF saving
         frames = []
         should_capture_frames = save_gifs and (render_all or episode == 0)  # Save first episode or all
-        
+
         if should_capture_frames:
-            print(f"📹 Recording test episode {episode+1} for GIF...")
+            print(f"📹 Recording FULL test episode {episode+1} for GIF...")
             if raw_state is not None and len(raw_state.shape) == 3 and raw_state.shape[2] == 3:
                 frames.append(raw_state.copy())
-        
+
         # Episode loop
         while steps < max_steps_per_episode:
             # Select action (no exploration)
             action = agent.act(stacked_state, training=False)
-            
+
             # Step environment
             next_stacked_state, reward, done, info, raw_next_state = env.step(action)
-            
-            # Capture frames for GIF (every 3 steps to keep GIF manageable)
-            if should_capture_frames and steps % 3 == 0:
+
+            # Capture ALL frames for complete episode GIF
+            if should_capture_frames:
                 if raw_next_state is not None and len(raw_next_state.shape) == 3 and raw_next_state.shape[2] == 3:
                     frames.append(raw_next_state.copy())
             
@@ -643,17 +727,26 @@ def test_mario_integrated(
             else:  # Standalone test
                 gif_filename = f'{SAVING_FOLDER}/test_ep{episode+1}_{completion_status}_score{total_reward:.0f}_x{x_pos}.gif'
             
-            print(f"💾 Saving test GIF: {gif_filename}")
-            
-            # Save GIF using your existing function (assuming it exists)
+            print(f"💾 Saving FULL episode GIF: {gif_filename}")
+
+            # Save full episode GIF with enhanced function
             try:
-                save_frames_as_gif(frames = frames, 
-                                   episode = episode+1, 
-                                   gif_filename= gif_filename,
-                                   saving_folder=SAVING_FOLDER)
-            except NameError:
-                import imageio
-                imageio.mimsave(gif_filename, frames, fps=10)
+                # Use the new save_episode_as_gif for complete episodes
+                save_episode_as_gif(frames=frames,
+                                  episode=episode+1,
+                                  fps=15,
+                                  saving_folder=SAVING_FOLDER,
+                                  quality='high')
+
+                # Also save a traditional version for backward compatibility
+                """ save_frames_as_gif(frames=frames,
+                                 episode=episode+1,
+                                 gif_filename=gif_filename,
+                                 saving_folder=SAVING_FOLDER,
+                                 frame_skip=3,  # Keep traditional skip for smaller files
+                                 max_frames=200) """
+            except Exception as e:
+                print(f"⚠️ Failed to save GIF: {e}")
         
         # Collect metrics
         test_scores.append(total_reward)
@@ -691,41 +784,102 @@ def test_mario_integrated(
     return results
 
 
-if __name__ == "__main__":
+def main():
+    """Main function with argument parsing for distributed training"""
+    parser = argparse.ArgumentParser(description='Train Mario RL Agent with optional distributed training')
+
+    # Distributed training arguments
+    parser.add_argument('--distributed', action='store_true',
+                        help='Enable distributed training across multiple GPUs')
+    parser.add_argument('--world-size', type=int, default=torch.cuda.device_count() if torch.cuda.is_available() else 1,
+                        help='Number of GPUs to use for distributed training')
+
+    # Training hyperparameters
+    parser.add_argument('--model-name', type=str, default='ResNETv1',
+                        choices=['DQN', 'ResNETv1'], help='Model architecture')
+    parser.add_argument('--episodes', type=int, default=5000, help='Number of training episodes')
+    parser.add_argument('--max-steps', type=int, default=4000, help='Max steps per episode')
+    parser.add_argument('--learning-rate', type=float, default=0.0001, help='Learning rate')
+    parser.add_argument('--batch-size', type=int, default=64, help='Batch size')
+    parser.add_argument('--buffer-size', type=int, default=50000, help='Replay buffer size')
+    parser.add_argument('--frame-stack', type=int, default=4, help='Number of frames to stack')
+    parser.add_argument('--frame-skip', type=int, default=4, help='Number of frames to skip')
+    parser.add_argument('--epsilon-decay', type=float, default=0.995, help='Epsilon decay rate')
+    parser.add_argument('--save-every', type=int, default=250, help='Save model every N episodes')
+    parser.add_argument('--test-every', type=int, default=50, help='Test model every N episodes')
+    parser.add_argument('--moveset', type=str, default='balanced', help='Action moveset complexity')
+
+    # New optimizer and scheduler arguments
+    parser.add_argument('--optimizer', type=str, default='adamw', choices=['adam', 'adamw'],
+                        help='Optimizer type (adam or adamw)')
+    parser.add_argument('--weight-decay', type=float, default=1e-4,
+                        help='Weight decay for regularization')
+    parser.add_argument('--scheduler', type=str, default='exponential',
+                        choices=['exponential', 'cosine', 'step', 'plateau'],
+                        help='Learning rate scheduler type')
+    parser.add_argument('--scheduler-gamma', type=float, default=0.999,
+                        help='Scheduler gamma (decay factor for exponential/step schedulers)')
+    parser.add_argument('--scheduler-step-size', type=int, default=1000,
+                        help='Step size for StepLR scheduler')
+
+    args = parser.parse_args()
+
+    # Setup timestamp for saving
     date = datetime.datetime.now()
     now = f"{date.day}d_{date.hour}h_{date.minute}m"
 
-    SAVING_FOLDER = "gameplay_gifs/" + now
-    STATE_SHAPE = (84, 84)
-    EPISODES = 5000
-    MAX_STEPS = 4000
-    TEST_EVERY = 50
-    FRAMES_SKIP = 4         # Critical change
-    BUFFER_SIZE = 50000
-    BATCH_SIZE = 64
-    REPLAY_FREQUENCY = 4
-    FRAME_STACK = 4
-    EPSILON_DECAY = 0.999
-    SAVE_EVERY = 250
-    LEARNING_RATE = 0.0001
-    CUSTOM_ENV = True
-    MOVESET = "balanced"    # Perfect choice
+    # Training configuration
+    config = {
+        'model_name': args.model_name,
+        'episodes': args.episodes,
+        'max_steps': args.max_steps,
+        'learning_rate': args.learning_rate,
+        'frame_stack': args.frame_stack,
+        'frame_skip': args.frame_skip,
+        'epsilon_decay': args.epsilon_decay,
+        'batch_size': args.batch_size,
+        'buffer_size': args.buffer_size,
+        'replay_frequency': 4,
+        'save_every': args.save_every,
+        'custom_env': True,
+        'state_shape': (84, 84),
+        'moveset': args.moveset,
+        'test_every': args.test_every,
+        'optimizer_type': args.optimizer,
+        'weight_decay': args.weight_decay,
+        'scheduler_type': args.scheduler,
+        'scheduler_gamma': args.scheduler_gamma,
+        'scheduler_step_size': args.scheduler_step_size
+    }
+    if args.distributed and torch.cuda.is_available() and args.world_size > 1:
+        print(f"🚀 Starting distributed training on {args.world_size} GPUs")
 
-    agent, scores, metrics = train_mario(
-        model_name="ResNETv1",
-        episodes=EPISODES,
-        max_steps=MAX_STEPS,
-        learning_rate=LEARNING_RATE,
-        frame_stack= FRAME_STACK,
-        frame_skip=FRAMES_SKIP,        # Better reactivity
-        epsilon_decay=0.995, # Slower decay per episode
-        batch_size=BATCH_SIZE,       # Larger batches for stability
-        buffer_size=BUFFER_SIZE,   # More diverse experiences
-        replay_frequency=REPLAY_FREQUENCY,   # Train every 4 steps
-        save_every=SAVE_EVERY,
-        custom_env= CUSTOM_ENV,
-        state_shape = STATE_SHAPE,
-        moveset = MOVESET,
-        test_every = TEST_EVERY
-    )
-    print(f"🎯 Training completed with best score: {metrics['best_avg_score']:.2f}")
+        # Verify we have enough GPUs
+        if args.world_size > torch.cuda.device_count():
+            print(f"❌ Error: Requested {args.world_size} GPUs but only {torch.cuda.device_count()} available")
+            return
+
+        # Start distributed training
+        mp.spawn(train_mario_distributed,
+                 args=(args.world_size,),
+                 kwargs=config,
+                 nprocs=args.world_size,
+                 join=True)
+
+        print(f"🎯 Distributed training completed!")
+
+    else:
+        if args.distributed:
+            print("⚠️ Distributed training requested but conditions not met. Running single GPU training.")
+            print(f"   CUDA available: {torch.cuda.is_available()}")
+            print(f"   World size: {args.world_size}")
+
+        print(f"🚀 Starting single GPU/CPU training")
+
+        # Run single GPU training
+        agent, scores, metrics = train_mario(**config)
+
+        print(f"🎯 Training completed with best score: {metrics['best_avg_score']:.2f}")
+
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
 import random
 import numpy as np
 from collections import deque
@@ -23,20 +25,41 @@ class ReplayBuffer:
 
 class Agent:
     def __init__(self,
-                model, 
-                state_shape, 
-                n_actions, 
-                learning_rate=1e-4, 
-                gamma=0.99, 
-                epsilon_start=1.0, 
-                epsilon_end=0.01, 
+                model,
+                state_shape,
+                n_actions,
+                learning_rate=1e-4,
+                gamma=0.99,
+                epsilon_start=1.0,
+                epsilon_end=0.01,
                 epsilon_decay=0.995,
                 batch_size=32,
-                buffer_size=10000):
-        
+                buffer_size=10000,
+                rank=None,
+                world_size=None,
+                optimizer_type='adamw',
+                weight_decay=1e-4,
+                scheduler_type='exponential',
+                scheduler_gamma=0.999,
+                scheduler_step_size=1000,
+                total_episodes=5000):
+
         self.model = model
-        self.device = torch.device("mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu") 
-        print(f"🌐 Initializing agent on device: {self.device}")
+        self.rank = rank
+        self.world_size = world_size
+        self.is_distributed = rank is not None and world_size is not None
+
+        # Device selection for distributed training
+        if self.is_distributed:
+            self.device = torch.device(f"cuda:{rank}")
+            torch.cuda.set_device(rank)
+        else:
+            self.device = torch.device("mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu")
+
+        if self.is_distributed:
+            print(f"🌐 Initializing agent on device: {self.device} (rank {rank}/{world_size})")
+        else:
+            print(f"🌐 Initializing agent on device: {self.device}")
 
         
         print(f"🖥️  Using device: {self.device}")
@@ -64,16 +87,53 @@ class Agent:
         self.q_network = self.model(state_shape=state_shape, n_actions=n_actions).to(self.device)
         self.target_network = self.model(state_shape=state_shape, n_actions=n_actions).to(self.device)
         self.target_network.load_state_dict(self.q_network.state_dict())
+
+        # Wrap with DDP if distributed training is enabled
+        if self.is_distributed:
+            self.q_network = DDP(self.q_network, device_ids=[rank], output_device=rank)
+            # Note: target_network is not wrapped with DDP as it's only used for inference
         
         # Optimizer and replay buffer
-        self.optimizer = optim.Adam(self.q_network.parameters(), 
-                                    lr=learning_rate,
-                                    weight_decay=1e-5)
-        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 
-                                                              mode='max', 
-                                                              factor=0.5, 
-                                                              patience=1000, 
-                                                              verbose=True)
+        # Get parameters from the wrapped model if using DDP
+        params = self.q_network.module.parameters() if self.is_distributed else self.q_network.parameters()
+
+        # Choose optimizer type
+        if optimizer_type.lower() == 'adamw':
+            self.optimizer = optim.AdamW(params,
+                                       lr=learning_rate,
+                                       weight_decay=weight_decay)
+        elif optimizer_type.lower() == 'adam':
+            self.optimizer = optim.Adam(params,
+                                      lr=learning_rate,
+                                      weight_decay=weight_decay)
+        else:
+            raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
+
+        # Choose scheduler type
+        if scheduler_type.lower() == 'exponential':
+            self.scheduler = optim.lr_scheduler.ExponentialLR(self.optimizer,
+                                                            gamma=scheduler_gamma)
+        elif scheduler_type.lower() == 'cosine':
+            self.scheduler = optim.lr_scheduler.CosineAnnealingLR(self.optimizer,
+                                                                T_max=total_episodes,
+                                                                eta_min=learning_rate * 0.01)
+        elif scheduler_type.lower() == 'step':
+            self.scheduler = optim.lr_scheduler.StepLR(self.optimizer,
+                                                     step_size=scheduler_step_size,
+                                                     gamma=scheduler_gamma)
+        elif scheduler_type.lower() == 'plateau':
+            self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,
+                                                                mode='max',
+                                                                factor=0.5,
+                                                                patience=100,  # Reduced from 1000
+                                                                verbose=True)
+        else:
+            raise ValueError(f"Unsupported scheduler type: {scheduler_type}")
+
+        self.scheduler_type = scheduler_type.lower()
+
+        print(f"🔧 Optimizer: {optimizer_type} (lr={learning_rate}, weight_decay={weight_decay})")
+        print(f"📈 Scheduler: {scheduler_type} (gamma={scheduler_gamma if 'gamma' in locals() else 'N/A'})")
         self.replay_buffer = ReplayBuffer(buffer_size)
         
         # Training metrics
@@ -84,6 +144,18 @@ class Agent:
         """Decay epsilon - call once per episode"""
         if self.epsilon > self.epsilon_end:
             self.epsilon *= self.epsilon_decay
+
+    def step_scheduler(self, metric=None):
+        """Step the learning rate scheduler"""
+        if self.scheduler_type == 'plateau':
+            if metric is not None:
+                self.scheduler.step(metric)
+        else:
+            self.scheduler.step()
+
+    def get_current_lr(self):
+        """Get current learning rate"""
+        return self.optimizer.param_groups[0]['lr']
         
     def act(self, state, training=True):
         """
@@ -177,48 +249,51 @@ class Agent:
     def replay(self, batch_size=None):
         """
         Train the agent on a batch of experiences
-        
+
         Args:
             batch_size: Size of training batch (uses default if None)
         """
         if batch_size is None:
             batch_size = self.batch_size
-            
+
         if len(self.replay_buffer) < batch_size:
             return
-        
+
         # Sample batch from replay buffer
         states, actions, rewards, next_states, dones = self.replay_buffer.sample(batch_size)
-        
+
         # Convert to tensors with proper shapes
         states_tensor = self._prepare_batch_tensor(states)
         next_states_tensor = self._prepare_batch_tensor(next_states)
         actions_tensor = torch.LongTensor(actions).to(self.device)
         rewards_tensor = torch.FloatTensor(rewards).to(self.device)
         dones_tensor = torch.FloatTensor(dones).to(self.device)
-        
+
         # Compute current Q-values
         current_q_values = self.q_network(states_tensor).gather(1, actions_tensor.unsqueeze(1))
-        
+
         # Compute next Q-values (Double DQN style)
         with torch.no_grad():
             next_q_values = self.target_network(next_states_tensor).max(1)[0]
             target_q_values = rewards_tensor + (self.gamma * next_q_values * (1 - dones_tensor))
-        
+
         # Compute loss
         loss = nn.MSELoss()(current_q_values.squeeze(), target_q_values)
-        
+
         # Optimize
         self.optimizer.zero_grad()
         loss.backward()
-        
-        # Gradient clipping for stability
-        torch.nn.utils.clip_grad_norm_(self.q_network.parameters(), max_norm=1.0)
-        
+
+        # Gradient clipping for stability - handle DDP case
+        if self.is_distributed:
+            torch.nn.utils.clip_grad_norm_(self.q_network.module.parameters(), max_norm=1.0)
+        else:
+            torch.nn.utils.clip_grad_norm_(self.q_network.parameters(), max_norm=1.0)
+
         self.optimizer.step()
-        
+
         # Epsilon decay moved to training loop (per episode, not per step)
-        
+
         return loss.item()
     
     def _prepare_batch_tensor(self, states_batch):
@@ -251,12 +326,23 @@ class Agent:
     
     def update_target_network(self):
         """Update target network with current Q-network weights"""
-        self.target_network.load_state_dict(self.q_network.state_dict())
+        # Get state dict from the wrapped model if using DDP
+        if self.is_distributed:
+            self.target_network.load_state_dict(self.q_network.module.state_dict())
+        else:
+            self.target_network.load_state_dict(self.q_network.state_dict())
     
     def save(self, filepath):
         """Save agent state"""
+        # Only save from rank 0 in distributed training
+        if self.is_distributed and self.rank != 0:
+            return
+
+        # Get state dict from the wrapped model if using DDP
+        q_network_state = self.q_network.module.state_dict() if self.is_distributed else self.q_network.state_dict()
+
         torch.save({
-            'q_network_state_dict': self.q_network.state_dict(),
+            'q_network_state_dict': q_network_state,
             'target_network_state_dict': self.target_network.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
             'epsilon': self.epsilon,
@@ -270,26 +356,43 @@ class Agent:
     def load(self, filepath):
         """Load agent state"""
         checkpoint = torch.load(filepath, map_location=self.device)
-        self.q_network.load_state_dict(checkpoint['q_network_state_dict'])
+
+        # Load state dict into the wrapped model if using DDP
+        if self.is_distributed:
+            self.q_network.module.load_state_dict(checkpoint['q_network_state_dict'])
+        else:
+            self.q_network.load_state_dict(checkpoint['q_network_state_dict'])
+
         self.target_network.load_state_dict(checkpoint['target_network_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         self.epsilon = checkpoint['epsilon']
         self.step_count = checkpoint.get('step_count', 0)
         self.total_reward = checkpoint.get('total_reward', 0)
-        print(f"📂 Agent loaded from {filepath}")
-        print(f"   • Epsilon: {self.epsilon:.4f}")
-        print(f"   • Steps: {self.step_count}")
-        print(f"   • Total reward: {self.total_reward:.2f}")
+
+        if not self.is_distributed or self.rank == 0:
+            print(f"📂 Agent loaded from {filepath}")
+            print(f"   • Epsilon: {self.epsilon:.4f}")
+            print(f"   • Steps: {self.step_count}")
+            print(f"   • Total reward: {self.total_reward:.2f}")
     
     def get_stats(self):
         """Get training statistics"""
-        return {
+        stats = {
             'epsilon': self.epsilon,
             'step_count': self.step_count,
             'total_reward': self.total_reward,
             'buffer_size': len(self.replay_buffer),
             'device': str(self.device)
         }
+
+        if self.is_distributed:
+            stats.update({
+                'rank': self.rank,
+                'world_size': self.world_size,
+                'distributed': True
+            })
+
+        return stats
     
     def set_training_mode(self, training=True):
         """Set training/evaluation mode"""
