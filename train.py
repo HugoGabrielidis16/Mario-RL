@@ -218,7 +218,7 @@ def train_mario(
     if test_every > 0:
         os.makedirs('test_results', exist_ok=True)
     
-    print(f"\n🎮 Starting training with:")
+    print(f"\n Starting training with:")
     print(f"   • Frame Stack: {frame_stack}")
     print(f"   • Learning Rate: {learning_rate}")
     print(f"   • Number of Episodes: {episodes}")
@@ -515,7 +515,7 @@ def train_mario(
             
             # Save training plots every 50 episodes
             if episode % 50 == 0 and episode > 0:
-                tqdm.write(f"📈 Saving training plots at episode {episode+1}...")
+                tqdm.write(f" Saving training plots at episode {episode+1}...")
                 #save_training_plots(scores, losses, epsilon_history, episode_lengths, episode)
             
             # Save model checkpoints
@@ -525,17 +525,17 @@ def train_mario(
             
             # Early stopping check
             if patience_counter >= patience:
-                tqdm.write(f"🛑 Early stopping: No improvement for {patience} episodes")
+                tqdm.write(f" Early stopping: No improvement for {patience} episodes")
                 tqdm.write(f"   Best average score: {best_avg_score:.2f}")
                 break
             
             # Emergency epsilon reset if completely stuck
             if episode > 100 and agent.epsilon < 0.01 and avg_score < 500:
-                tqdm.write(f"🚨 Emergency epsilon reset: Agent stuck with low score")
+                tqdm.write(f" Emergency epsilon reset: Agent stuck with low score")
                 agent.epsilon = 0.2
     
     except KeyboardInterrupt:
-        tqdm.write("\n⏹️  Training interrupted by user")
+        tqdm.write("\n Training interrupted by user")
     
     finally:
         # Close progress bar
@@ -543,7 +543,7 @@ def train_mario(
         
         # Final test evaluation if testing is enabled
         if test_every > 0:
-            tqdm.write(f"\n🧪 Running final test evaluation...")
+            tqdm.write(f"\n Running final test evaluation...")
             final_test_results = run_test_evaluation(episode + 1, agent, {
                 'frame_stack': frame_stack,
                 'frame_skip': frame_skip,
@@ -563,7 +563,7 @@ def train_mario(
         
         # Training completed
         total_time = time.time() - training_start_time
-        tqdm.write(f"\n🏁 Training completed!")
+        tqdm.write(f"\n Training completed!")
         tqdm.write(f"   • Episodes: {episode + 1}")
         tqdm.write(f"   • Total time: {total_time/60:.1f} minutes")
         tqdm.write(f"   • Avg time per episode: {total_time/(episode+1):.1f} seconds")
@@ -573,7 +573,7 @@ def train_mario(
         
         # Print test summary if available
         if test_history:
-            tqdm.write(f"\n🧪 Test Summary:")
+            tqdm.write(f"\n Test Summary:")
             tqdm.write(f"   • Total tests run: {len(test_history)}")
             
             # Get best test performance
@@ -727,7 +727,7 @@ def test_mario_integrated(
             else:  # Standalone test
                 gif_filename = f'{SAVING_FOLDER}/test_ep{episode+1}_{completion_status}_score{total_reward:.0f}_x{x_pos}.gif'
             
-            print(f"💾 Saving FULL episode GIF: {gif_filename}")
+            print(f" Saving FULL episode GIF: {gif_filename}")
 
             # Save full episode GIF with enhanced function
             try:
@@ -746,7 +746,7 @@ def test_mario_integrated(
                                  frame_skip=3,  # Keep traditional skip for smaller files
                                  max_frames=200) """
             except Exception as e:
-                print(f"⚠️ Failed to save GIF: {e}")
+                print(f" Failed to save GIF: {e}")
         
         # Collect metrics
         test_scores.append(total_reward)
@@ -805,7 +805,7 @@ def main():
     parser.add_argument('--frame-stack', type=int, default=4, help='Number of frames to stack')
     parser.add_argument('--frame-skip', type=int, default=4, help='Number of frames to skip')
     parser.add_argument('--epsilon-decay', type=float, default=0.995, help='Epsilon decay rate')
-    parser.add_argument('--save-every', type=int, default=250, help='Save model every N episodes')
+    parser.add_argument('--save-every', type=int, default=50, help='Save model every N episodes')
     parser.add_argument('--test-every', type=int, default=50, help='Test model every N episodes')
     parser.add_argument('--moveset', type=str, default='balanced', help='Action moveset complexity')
 
@@ -856,7 +856,7 @@ def main():
 
         # Verify we have enough GPUs
         if args.world_size > torch.cuda.device_count():
-            print(f"❌ Error: Requested {args.world_size} GPUs but only {torch.cuda.device_count()} available")
+            print(f"Error: Requested {args.world_size} GPUs but only {torch.cuda.device_count()} available")
             return
 
         # Start distributed training
