@@ -14,11 +14,14 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from model.DQN import DQN
 from model.ResNET import MultiFrameResNet
+from model.ImpalaDQN import ImpalaDQN, ImpalaDuelingDQN, ImpalaNoisyDQN, ImpalaDuelingNoisyDQN
 from model.agent import Agent
 from visualization import save_frames_as_gif, save_episode_as_gif, progress_logger
 
 import warnings
 warnings.filterwarnings("ignore")
+
+import wandb
 
 
 SAVING_FOLDER = "gamplay_gifs"
@@ -56,19 +59,46 @@ def load_model(
             scheduler_gamma=0.999,
             scheduler_step_size=1000,
             total_episodes=5000,
+            n_step=1,
             *args,
             **kwargs
             ):
     print(f"Using model: {model_name}" + (f" on rank {rank}/{world_size}" if rank is not None else ""))
+
+    # Check if using noisy network for epsilon override
+    use_noisy = model_name in ["ImpalaNoisy", "ImpalaFull"]
+
     if model_name == "DQN":
-        model = DQN
+        q_network = DQN(state_shape=state_shape, n_actions=n_actions)
+        target_network = DQN(state_shape=state_shape, n_actions=n_actions)
     elif model_name == "ResNETv1":
-        model = MultiFrameResNet
+        q_network = MultiFrameResNet(state_shape=state_shape, n_actions=n_actions)
+        target_network = MultiFrameResNet(state_shape=state_shape, n_actions=n_actions)
+    elif model_name == "ImpalaDQN":
+        q_network = ImpalaDQN(state_shape=state_shape, n_actions=n_actions, dueling=False, noisy=False)
+        target_network = ImpalaDQN(state_shape=state_shape, n_actions=n_actions, dueling=False, noisy=False)
+    elif model_name == "ImpalaDueling":
+        q_network = ImpalaDuelingDQN(state_shape=state_shape, n_actions=n_actions)
+        target_network = ImpalaDuelingDQN(state_shape=state_shape, n_actions=n_actions)
+    elif model_name == "ImpalaNoisy":
+        q_network = ImpalaNoisyDQN(state_shape=state_shape, n_actions=n_actions)
+        target_network = ImpalaNoisyDQN(state_shape=state_shape, n_actions=n_actions)
+    elif model_name == "ImpalaFull":
+        q_network = ImpalaDuelingNoisyDQN(state_shape=state_shape, n_actions=n_actions)
+        target_network = ImpalaDuelingNoisyDQN(state_shape=state_shape, n_actions=n_actions)
     else:
-        raise ValueError("Model name Inappropriate")
+        raise ValueError(f"Model name '{model_name}' not recognized. Available: DQN, ResNETv1, ImpalaDQN, ImpalaDueling, ImpalaNoisy, ImpalaFull")
+
+    # Override epsilon parameters for noisy networks (they don't use epsilon-greedy)
+    if use_noisy:
+        print(f"🔊 NoisyNet detected - disabling epsilon-greedy exploration")
+        epsilon_start = 0.0
+        epsilon_end = 0.0
+        epsilon_decay = 1.0
 
     agent = Agent(
-        model = model,
+        q_network=q_network,
+        target_network=target_network,
         state_shape = state_shape,
         n_actions = n_actions,
         learning_rate=learning_rate,
@@ -84,7 +114,8 @@ def load_model(
         scheduler_type=scheduler_type,
         scheduler_gamma=scheduler_gamma,
         scheduler_step_size=scheduler_step_size,
-        total_episodes=total_episodes
+        total_episodes=total_episodes,
+        n_step=n_step
     )
     return agent
 
@@ -137,6 +168,10 @@ def train_mario(
         scheduler_type='exponential',  # New scheduler options
         scheduler_gamma=0.999,
         scheduler_step_size=1000,
+        use_wandb=False,  # W&B logging
+        wandb_project="mario-rl",  # W&B project name
+        wandb_entity=None,  # W&B entity (team/user)
+        n_step=1,  # N-step returns
         *args,**kwargs):  # Larger buffer
     """
     Train Mario using RL-optimized environment with improved training strategy and TQDM progress bars
@@ -200,9 +235,40 @@ def train_mario(
         scheduler_type=scheduler_type,
         scheduler_gamma=scheduler_gamma,
         scheduler_step_size=scheduler_step_size,
-        total_episodes=episodes
+        total_episodes=episodes,
+        n_step=n_step
     )
     
+    # Initialize W&B if enabled (only on rank 0 for distributed training)
+    should_log_wandb = use_wandb and (rank is None or rank == 0)
+    if should_log_wandb:
+        wandb.init(
+            project=wandb_project,
+            entity=wandb_entity,
+            config={
+                "model_name": model_name,
+                "episodes": episodes,
+                "learning_rate": learning_rate,
+                "frame_stack": frame_stack,
+                "frame_skip": frame_skip,
+                "epsilon_start": epsilon_start,
+                "epsilon_end": epsilon_end,
+                "epsilon_decay": epsilon_decay,
+                "batch_size": batch_size,
+                "buffer_size": buffer_size,
+                "state_shape": state_shape,
+                "moveset": moveset,
+                "max_steps": max_steps,
+                "optimizer": optimizer_type,
+                "weight_decay": weight_decay,
+                "scheduler": scheduler_type,
+                "scheduler_gamma": scheduler_gamma,
+                "world_size": world_size if world_size else 1,
+                "n_step": n_step,
+            },
+            name=f"{model_name}_ep{episodes}_{moveset}_n{n_step}"
+        )
+
     # Training metrics
     scores = []
     moving_avg = deque(maxlen=100)
@@ -229,6 +295,7 @@ def train_mario(
     print(f"   • Frame Skip: {frame_skip}")
     print(f"   • State Shape: {stacked_state_shape}")
     print(f"   • Action Space: {n_actions}")
+    print(f"   • N-Step Returns: {n_step}")
     print(f"   • Epsilon: {epsilon_start} → {epsilon_end} (decay: {epsilon_decay})")
     print(f"   • Buffer Size: {buffer_size}")
     print(f"   • Batch Size: {batch_size}")
@@ -492,6 +559,34 @@ def train_mario(
                     leave=True
                 )
             
+            # Log to W&B if enabled
+            if should_log_wandb:
+                wandb_log = {
+                    "episode": episode + 1,
+                    "score": total_reward,
+                    "avg_score": avg_score,
+                    "best_avg_score": best_avg_score,
+                    "epsilon": agent.epsilon,
+                    "learning_rate": current_lr,
+                    "loss": avg_loss,
+                    "episode_length": steps,
+                    "buffer_size": len(agent.replay_buffer),
+                    "max_x_position": game_state["max_x_pos"],
+                    "patience_counter": patience_counter,
+                }
+
+                # Add test metrics if available
+                if test_history and test_history[-1]['episode'] == episode + 1:
+                    last_test = test_history[-1]['test_results']
+                    wandb_log.update({
+                        "test/avg_score": last_test['average_score'],
+                        "test/completion_rate": last_test['completion_rate'],
+                        "test/best_score": last_test['best_score'],
+                        "test/avg_x_position": last_test['average_x_position'],
+                    })
+
+                wandb.log(wandb_log)
+
             # Update main progress bar with rich information
             episode_pbar.set_postfix(postfix_data)
             save_frames_this_episode = True
@@ -589,7 +684,11 @@ def train_mario(
         # Save final model and plots
         agent.save(f'checkpoints/final_model_{model_name}.pth')
         #save_training_plots(scores, losses, epsilon_history, episode_lengths, episode, final=True)
-        
+
+        # Finish W&B run
+        if should_log_wandb:
+            wandb.finish()
+
         env.close()
     
     return agent, scores, {
@@ -796,7 +895,8 @@ def main():
 
     # Training hyperparameters
     parser.add_argument('--model-name', type=str, default='ResNETv1',
-                        choices=['DQN', 'ResNETv1'], help='Model architecture')
+                        choices=['DQN', 'ResNETv1', 'ImpalaDQN', 'ImpalaDueling', 'ImpalaNoisy', 'ImpalaFull'],
+                        help='Model architecture')
     parser.add_argument('--episodes', type=int, default=5000, help='Number of training episodes')
     parser.add_argument('--max-steps', type=int, default=4000, help='Max steps per episode')
     parser.add_argument('--learning-rate', type=float, default=0.0001, help='Learning rate')
@@ -808,6 +908,7 @@ def main():
     parser.add_argument('--save-every', type=int, default=50, help='Save model every N episodes')
     parser.add_argument('--test-every', type=int, default=50, help='Test model every N episodes')
     parser.add_argument('--moveset', type=str, default='balanced', help='Action moveset complexity')
+    parser.add_argument('--n-step', type=int, default=3, help='N-step returns for temporal credit assignment (1-5 recommended)')
 
     # New optimizer and scheduler arguments
     parser.add_argument('--optimizer', type=str, default='adamw', choices=['adam', 'adamw'],
@@ -821,6 +922,14 @@ def main():
                         help='Scheduler gamma (decay factor for exponential/step schedulers)')
     parser.add_argument('--scheduler-step-size', type=int, default=1000,
                         help='Step size for StepLR scheduler')
+
+    # W&B arguments
+    parser.add_argument('--wandb', action='store_true',
+                        help='Enable Weights & Biases logging')
+    parser.add_argument('--wandb-project', type=str, default='mario-rl',
+                        help='W&B project name')
+    parser.add_argument('--wandb-entity', type=str, default=None,
+                        help='W&B entity (team/user)')
 
     args = parser.parse_args()
 
@@ -849,7 +958,11 @@ def main():
         'weight_decay': args.weight_decay,
         'scheduler_type': args.scheduler,
         'scheduler_gamma': args.scheduler_gamma,
-        'scheduler_step_size': args.scheduler_step_size
+        'scheduler_step_size': args.scheduler_step_size,
+        'use_wandb': args.wandb,
+        'wandb_project': args.wandb_project,
+        'wandb_entity': args.wandb_entity,
+        'n_step': args.n_step
     }
     if args.distributed and torch.cuda.is_available() and args.world_size > 1:
         print(f"🚀 Starting distributed training on {args.world_size} GPUs")

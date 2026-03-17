@@ -25,7 +25,8 @@ class ReplayBuffer:
 
 class Agent:
     def __init__(self,
-                model,
+                q_network,
+                target_network,
                 state_shape,
                 n_actions,
                 learning_rate=1e-4,
@@ -42,9 +43,9 @@ class Agent:
                 scheduler_type='exponential',
                 scheduler_gamma=0.999,
                 scheduler_step_size=1000,
-                total_episodes=5000):
+                total_episodes=5000,
+                n_step=1):
 
-        self.model = model
         self.rank = rank
         self.world_size = world_size
         self.is_distributed = rank is not None and world_size is not None
@@ -61,11 +62,12 @@ class Agent:
         else:
             print(f"🌐 Initializing agent on device: {self.device}")
 
-        
+
         print(f"🖥️  Using device: {self.device}")
         print(f"📊 State shape: {state_shape}")
         print(f"🎯 N_actions: {n_actions}")
-        
+        print(f"🔢 N-step returns: {n_step}")
+
         self.state_shape = state_shape
         self.n_actions = n_actions
         self.gamma = gamma
@@ -73,7 +75,11 @@ class Agent:
         self.epsilon_end = epsilon_end
         self.epsilon_decay = epsilon_decay
         self.batch_size = batch_size
-        
+        self.n_step = n_step
+
+        # N-step buffer for accumulating multi-step returns
+        self.n_step_buffer = deque(maxlen=n_step)
+
         # Determine if we're using frame stacking
         self.is_frame_stacked = len(state_shape) == 3  # (frame_stack, H, W)
         if self.is_frame_stacked:
@@ -82,10 +88,10 @@ class Agent:
         else:
             self.frame_stack = 1
             print(f"📷 Single frame mode")
-        
-        # Neural networks
-        self.q_network = self.model(state_shape=state_shape, n_actions=n_actions).to(self.device)
-        self.target_network = self.model(state_shape=state_shape, n_actions=n_actions).to(self.device)
+
+        # Neural networks - receive instances and move to device
+        self.q_network = q_network.to(self.device)
+        self.target_network = target_network.to(self.device)
         self.target_network.load_state_dict(self.q_network.state_dict())
 
         # Wrap with DDP if distributed training is enabled
@@ -160,23 +166,32 @@ class Agent:
     def act(self, state, training=True):
         """
         Select action using epsilon-greedy policy
-        
+
         Args:
             state: Game state (frame_stack, H, W) for stacked frames or (H, W) for single frame
             training: Whether to use exploration (epsilon-greedy)
         """
-        # Handle epsilon-greedy exploration during training
-        if training and random.random() < self.epsilon:
+        # Reset noise for NoisyNet before action selection
+        if hasattr(self.q_network, 'reset_noise'):
+            self.q_network.reset_noise()
+        elif hasattr(self.q_network, 'module') and hasattr(self.q_network.module, 'reset_noise'):
+            self.q_network.module.reset_noise()
+
+        # Handle epsilon-greedy exploration during training (skip if using NoisyNet)
+        is_noisy = (hasattr(self.q_network, 'noisy') and self.q_network.noisy) or \
+                   (hasattr(self.q_network, 'module') and hasattr(self.q_network.module, 'noisy') and self.q_network.module.noisy)
+
+        if training and not is_noisy and random.random() < self.epsilon:
             return random.randint(0, self.n_actions - 1)
-        
+
         # Convert state to tensor and ensure correct shape
         state_tensor = self._prepare_state_tensor(state)
-        
+
         # Get Q-values and select best action
         with torch.no_grad():
             q_values = self.q_network(state_tensor)
             action = q_values.argmax().item()
-        
+
         return action
     
     def _prepare_state_tensor(self, state):
@@ -224,8 +239,8 @@ class Agent:
     
     def remember(self, state, action, reward, next_state, done):
         """
-        Store experience in replay buffer
-        
+        Store experience in replay buffer with n-step returns
+
         Args:
             state: Current state
             action: Action taken
@@ -238,10 +253,52 @@ class Agent:
             state = state.cpu().numpy()
         if isinstance(next_state, torch.Tensor):
             next_state = next_state.cpu().numpy()
-        
-        # Store in replay buffer
-        self.replay_buffer.push(state, action, reward, next_state, done)
-        
+
+        # Add transition to n-step buffer
+        self.n_step_buffer.append((state, action, reward, next_state, done))
+
+        # If we have enough steps or episode ended, compute n-step return
+        if len(self.n_step_buffer) == self.n_step or done:
+            # Get the first transition from the buffer
+            first_state, first_action, _, _, _ = self.n_step_buffer[0]
+
+            # Compute n-step return
+            n_step_reward = 0
+            n_step_state = next_state
+            n_step_done = done
+
+            # Sum discounted rewards
+            for i, (_, _, r, s, d) in enumerate(self.n_step_buffer):
+                n_step_reward += (self.gamma ** i) * r
+                n_step_state = s
+                n_step_done = d
+                if d:  # Episode ended, stop accumulating
+                    break
+
+            # Store n-step transition in replay buffer
+            self.replay_buffer.push(first_state, first_action, n_step_reward, n_step_state, n_step_done)
+
+        # If episode ended, flush remaining transitions in n-step buffer
+        if done and len(self.n_step_buffer) > 1:
+            # Process remaining transitions (they'll have fewer than n steps)
+            buffer_list = list(self.n_step_buffer)
+            for start_idx in range(1, len(buffer_list)):
+                first_state, first_action, _, _, _ = buffer_list[start_idx]
+
+                # Compute remaining steps return
+                n_step_reward = 0
+                n_step_state = next_state
+                n_step_done = True  # Episode ended
+
+                for i, (_, _, r, s, d) in enumerate(buffer_list[start_idx:]):
+                    n_step_reward += (self.gamma ** i) * r
+                    n_step_state = s
+
+                self.replay_buffer.push(first_state, first_action, n_step_reward, n_step_state, n_step_done)
+
+            # Clear n-step buffer at episode end
+            self.n_step_buffer.clear()
+
         # Update metrics
         self.step_count += 1
         self.total_reward += reward
@@ -259,6 +316,15 @@ class Agent:
         if len(self.replay_buffer) < batch_size:
             return
 
+        # Reset noise for NoisyNet before training
+        if hasattr(self.q_network, 'reset_noise'):
+            self.q_network.reset_noise()
+        elif hasattr(self.q_network, 'module') and hasattr(self.q_network.module, 'reset_noise'):
+            self.q_network.module.reset_noise()
+
+        if hasattr(self.target_network, 'reset_noise'):
+            self.target_network.reset_noise()
+
         # Sample batch from replay buffer
         states, actions, rewards, next_states, dones = self.replay_buffer.sample(batch_size)
 
@@ -272,10 +338,14 @@ class Agent:
         # Compute current Q-values
         current_q_values = self.q_network(states_tensor).gather(1, actions_tensor.unsqueeze(1))
 
-        # Compute next Q-values (Double DQN style)
+        # Compute next Q-values (Double DQN style) with n-step returns
+        # Note: rewards_tensor already contains n-step cumulative rewards
+        # So we need to use gamma^n for bootstrapping
         with torch.no_grad():
             next_q_values = self.target_network(next_states_tensor).max(1)[0]
-            target_q_values = rewards_tensor + (self.gamma * next_q_values * (1 - dones_tensor))
+            # Use gamma^n_step for n-step bootstrapping
+            gamma_n = self.gamma ** self.n_step
+            target_q_values = rewards_tensor + (gamma_n * next_q_values * (1 - dones_tensor))
 
         # Compute loss
         loss = nn.MSELoss()(current_q_values.squeeze(), target_q_values)

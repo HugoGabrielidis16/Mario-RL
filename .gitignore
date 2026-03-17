@@ -33,3 +33,4 @@ wheels/
 .installed.cfg
 *.egg
 CLAUDE.md
+*.tar
